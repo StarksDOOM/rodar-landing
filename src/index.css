@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-display: "Outfit", var(--font-sans);
+
+  --color-brand-deep: #0a192f;
+  --color-brand-ocean: #1a3a5f;
+  --color-brand-accent: #2ecc71;
+  --color-brand-coral: #ff6b6b;
+  --color-brand-sand: #fefae0;
+
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-fade-in: fadeIn 1s ease-out forwards;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+:root {
+  background-color: var(--color-brand-deep);
+  color: white;
+}
+
+body {
+  margin: 0;
+  overflow-x: hidden;
+}
+
+/* Glassmorphism utility */
+.glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.text-gradient {
+  background: linear-gradient(to right, #ffffff, #64748b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
