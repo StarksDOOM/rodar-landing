@@ -3,6 +3,7 @@ import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { LandingPage } from './components/pages/LandingPage';
 import { AboutPage } from './components/pages/AboutPage';
+import { ContactPage } from './components/pages/ContactPage';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -14,6 +15,8 @@ export default function App() {
         return <LandingPage language={language} />;
       case 'about':
         return <AboutPage language={language} />;
+      case 'contact':
+        return <ContactPage language={language} />;
       default:
         return <LandingPage language={language} />;
     }
