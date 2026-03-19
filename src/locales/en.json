@@ -1,0 +1,49 @@
+{
+  "header": {
+    "nav": [
+      { "id": "home", "label": "Home" },
+      { "id": "about", "label": "About" },
+      { "id": "contact", "label": "Contact" }
+    ]
+  },
+  "footer": {
+    "legal": {
+      "terms": "Terms of Service",
+      "privacy": "Privacy Policy"
+    }
+  },
+  "landing": {
+    "headline": "Move at your own pace.",
+    "subheadline": "The Dominican Republic's car-sharing mobility platform.",
+    "waitlistBadge": "RODAR WAITLIST",
+    "emailPlaceholder": "Your email address...",
+    "cta": "JOIN",
+    "thankYou": "Done! We'll contact you soon."
+  },
+  "about": {
+    "title": "About Rodar",
+    "intro": "Rodar is the Dominican Republic's car-sharing mobility platform, operated by FulCastle Holdings, Inc. — connecting vehicle owners with people who need to rent them in a safe, verified, and 100% digital manner.",
+    "mission": {
+      "title": "Our Mission",
+      "description": "Transform the Dominican mobility ecosystem through peer-to-peer technology that prioritizes security, transparency, and equitable access to transportation."
+    },
+    "compliance": {
+      "title": "Legal Compliance",
+      "items": [
+        "Operating under Law 63-17 for Mobility, Land Transport, Traffic and Road Safety of the Dominican Republic",
+        "Complete KYC (Know Your Customer) verification for all users",
+        "Comprehensive insurance coverage on every transaction",
+        "Delaware, USA Incorporation — 8 The Green, Ste B, Dover, DE 19901"
+      ]
+    },
+    "values": {
+      "title": "Institutional Values",
+      "items": [
+        "Safety and Trust — Rigorous verification of users and vehicles",
+        "Transparency — Clear pricing, no hidden fees",
+        "Accessible Technology — 100% digital platform, no paperwork",
+        "Responsible Community — Building a collaborative ecosystem"
+      ]
+    }
+  }
+}

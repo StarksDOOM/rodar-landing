@@ -1,0 +1,49 @@
+{
+  "header": {
+    "nav": [
+      { "id": "home", "label": "Inicio" },
+      { "id": "about", "label": "Nosotros" },
+      { "id": "contact", "label": "Contacto" }
+    ]
+  },
+  "footer": {
+    "legal": {
+      "terms": "Términos de Servicio",
+      "privacy": "Política de Privacidad"
+    }
+  },
+  "landing": {
+    "headline": "Muévete a tu ritmo.",
+    "subheadline": "La plataforma de movilidad compartida de la República Dominicana.",
+    "waitlistBadge": "LISTA DE ESPERA RODAR",
+    "emailPlaceholder": "Tu correo electrónico...",
+    "cta": "UNIRME",
+    "thankYou": "¡Listo! Te contactaremos pronto."
+  },
+  "about": {
+    "title": "Sobre Rodar",
+    "intro": "Rodar es la plataforma de movilidad compartida de República Dominicana, operada por FulCastle Holdings, Inc. — conectando dueños de vehículos con personas que necesitan alquilarlos de manera segura, verificada y 100% digital.",
+    "mission": {
+      "title": "Nuestra Misión",
+      "description": "Transformar el ecosistema de movilidad dominicano mediante tecnología peer-to-peer que prioriza seguridad, transparencia y acceso equitativo al transporte."
+    },
+    "compliance": {
+      "title": "Cumplimiento Legal",
+      "items": [
+        "Operación bajo Ley 63-17 de Movilidad, Transporte Terrestre, Tránsito y Seguridad Vial de la República Dominicana",
+        "Verificación KYC (Know Your Customer) completa para todos los usuarios",
+        "Cobertura de seguro integral en cada transacción",
+        "Incorporación Delaware, USA — 8 The Green, Ste B, Dover, DE 19901"
+      ]
+    },
+    "values": {
+      "title": "Valores Institucionales",
+      "items": [
+        "Seguridad y Confianza — Verificación rigurosa de usuarios y vehículos",
+        "Transparencia — Precios claros, sin tarifas ocultas",
+        "Tecnología Accesible — Plataforma 100% digital, sin papeleos",
+        "Comunidad Responsable — Construyendo un ecosistema colaborativo"
+      ]
+    }
+  }
+}
