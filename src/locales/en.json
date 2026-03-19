@@ -45,5 +45,26 @@
         "Responsible Community — Building a collaborative ecosystem"
       ]
     }
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "We're here to answer all your questions about Rodar",
+    "form": {
+      "name": "Full name",
+      "email": "Email address",
+      "message": "Your message",
+      "messagePlaceholder": "Tell us how we can help you...",
+      "submit": "Send message"
+    },
+    "success": {
+      "title": "Message sent!",
+      "description": "Thank you for contacting us. We'll respond soon."
+    },
+    "info": {
+      "title": "Contact information",
+      "email": "hello@rodar.do",
+      "phone": "+1 (809) 123-4567",
+      "location": "Santo Domingo, Dominican Republic"
+    }
   }
 }

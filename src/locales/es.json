@@ -45,5 +45,26 @@
         "Comunidad Responsable — Construyendo un ecosistema colaborativo"
       ]
     }
+  },
+  "contact": {
+    "title": "Contáctanos",
+    "subtitle": "Estamos aquí para responder todas tus preguntas sobre Rodar",
+    "form": {
+      "name": "Nombre completo",
+      "email": "Correo electrónico",
+      "message": "Tu mensaje",
+      "messagePlaceholder": "Cuéntanos cómo podemos ayudarte...",
+      "submit": "Enviar mensaje"
+    },
+    "success": {
+      "title": "¡Mensaje enviado!",
+      "description": "Gracias por contactarnos. Te responderemos pronto."
+    },
+    "info": {
+      "title": "Información de contacto",
+      "email": "hola@rodar.do",
+      "phone": "+1 (809) 123-4567",
+      "location": "Santo Domingo, República Dominicana"
+    }
   }
 }
