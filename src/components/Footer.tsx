@@ -1,24 +1,12 @@
 import { motion } from 'motion/react';
+import { getTranslations } from '../lib/i18n';
 
 interface FooterProps {
   language: 'es' | 'en';
 }
 
 export function Footer({ language }: FooterProps) {
-  const text = {
-    es: {
-      legal: {
-        terms: 'Términos de Servicio',
-        privacy: 'Política de Privacidad'
-      }
-    },
-    en: {
-      legal: {
-        terms: 'Terms of Service',
-        privacy: 'Privacy Policy'
-      }
-    }
-  };
+  const t = getTranslations(language);
 
   return (
     <footer className="fixed bottom-0 left-0 right-0 z-40">
@@ -71,14 +59,14 @@ export function Footer({ language }: FooterProps) {
                 href="#" 
                 className="hover:text-white transition-colors duration-200"
               >
-                {text[language].legal.terms}
+                {t.footer.legal.terms}
               </a>
               {' | '}
               <a 
                 href="#" 
                 className="hover:text-white transition-colors duration-200"
               >
-                {text[language].legal.privacy}
+                {t.footer.legal.privacy}
               </a>
             </div>
 

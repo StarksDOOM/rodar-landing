@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
 import { DominicanFlag, USFlag } from './FlagComponents';
+import { getTranslations } from '../lib/i18n';
 
 interface HeaderProps {
   currentPage: string;
@@ -11,19 +12,7 @@ interface HeaderProps {
 
 export function Header({ currentPage, onPageChange, language, onLanguageChange }: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  const navigation = {
-    es: [
-      { id: 'home', label: 'Inicio' },
-      { id: 'about', label: 'Nosotros' },
-      { id: 'contact', label: 'Contacto' }
-    ],
-    en: [
-      { id: 'home', label: 'Home' },
-      { id: 'about', label: 'About' },
-      { id: 'contact', label: 'Contact' }
-    ]
-  };
+  const t = getTranslations(language);
 
   const handleNavClick = (pageId: string) => {
     onPageChange(pageId);
@@ -77,7 +66,7 @@ export function Header({ currentPage, onPageChange, language, onLanguageChange }
 
         {/* Center: Navigation Links */}
         <div className="flex items-center gap-3 md:gap-6">
-          {navigation[language].map((item) => (
+          {t.header.nav.map((item) => (
             <button
               key={item.id}
               onClick={() => handleNavClick(item.id)}
