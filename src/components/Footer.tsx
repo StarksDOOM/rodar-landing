@@ -1,3 +1,5 @@
+import { motion } from 'motion/react';
+
 interface FooterProps {
   language: 'es' | 'en';
 }
@@ -5,45 +7,82 @@ interface FooterProps {
 export function Footer({ language }: FooterProps) {
   const text = {
     es: {
-      copyright: '© 2026 FULCASTLE HOLDINGS, INC.',
-      address: '8 THE GREEN, STE B, DOVER, DE 19901',
-      terms: 'TÉRMINOS DE SERVICIO',
-      privacy: 'POLÍTICA DE PRIVACIDAD'
+      legal: {
+        terms: 'Términos de Servicio',
+        privacy: 'Política de Privacidad'
+      }
     },
     en: {
-      copyright: '© 2026 FULCASTLE HOLDINGS, INC.',
-      address: '8 THE GREEN, STE B, DOVER, DE 19901',
-      terms: 'TERMS OF SERVICE',
-      privacy: 'PRIVACY POLICY'
+      legal: {
+        terms: 'Terms of Service',
+        privacy: 'Privacy Policy'
+      }
     }
   };
 
   return (
-    <footer className="w-full py-8 px-6 border-t border-white/5 bg-black/20 backdrop-blur-md">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-        <div className="text-left">
-          <p className="text-[10px] font-bold tracking-widest text-white/40 mb-1">
-            {text[language].copyright}
-          </p>
-          <p className="text-[9px] text-white/20 tracking-wider">
-            {text[language].address}
-          </p>
-        </div>
+    <footer className="fixed bottom-0 left-0 right-0 z-40">
+      {/* The Institutional Fixed Footer - Non-Negotiable */}
+      <div 
+        className="w-full"
+        style={{
+          background: 'rgba(0, 0, 0, 0.4)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          borderTop: '1px solid rgba(255, 255, 255, 0.1)'
+        }}
+      >
+        <div className="max-w-7xl mx-auto px-3 md:px-8 py-2.5 md:py-3">
+          
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="grid grid-cols-1 md:grid-cols-3 gap-1.5 md:gap-0 text-center md:text-left"
+            style={{
+              fontFamily: '"SF Mono", "SF Pro Text", "Menlo", "Consolas", "Monaco", monospace',
+              fontSize: '9px',
+              color: '#9CA3AF',
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              lineHeight: '1.6'
+            }}
+          >
+            
+            {/* Left: Corporate Info */}
+            <div>
+              <p>© 2026 FulCastle Holdings, Inc.</p>
+              <p className="hidden md:block">8 The Green, Ste B, Dover, DE 19901</p>
+            </div>
 
-        <div className="flex flex-col items-center">
-          <a href="mailto:support@rodar.do" className="text-[10px] font-bold tracking-widest text-white/40 hover:text-brand-accent transition-colors uppercase">
-            support@rodar.do
-          </a>
-        </div>
+            {/* Center: Support Email */}
+            <div className="md:text-center">
+              <a 
+                href="mailto:support@rodar.do" 
+                className="hover:text-white transition-colors duration-200"
+              >
+                support@rodar.do
+              </a>
+            </div>
 
-        <div className="flex gap-8">
-          <a href="#" className="text-[9px] font-bold tracking-widest text-white/30 hover:text-white/60 transition-colors uppercase">
-            {text[language].terms}
-          </a>
-          <span className="text-white/10">|</span>
-          <a href="#" className="text-[9px] font-bold tracking-widest text-white/30 hover:text-white/60 transition-colors uppercase">
-            {text[language].privacy}
-          </a>
+            {/* Right: Legal Links */}
+            <div className="md:text-right">
+              <a 
+                href="#" 
+                className="hover:text-white transition-colors duration-200"
+              >
+                {text[language].legal.terms}
+              </a>
+              {' | '}
+              <a 
+                href="#" 
+                className="hover:text-white transition-colors duration-200"
+              >
+                {text[language].legal.privacy}
+              </a>
+            </div>
+
+          </motion.div>
         </div>
       </div>
     </footer>

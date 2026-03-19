@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { DominicanFlag, USFlag } from './FlagComponents';
 
 interface HeaderProps {
@@ -31,62 +31,121 @@ export function Header({ currentPage, onPageChange, language, onLanguageChange }
   };
 
   return (
-    <motion.header 
+    <motion.header
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      className="fixed top-0 left-0 right-0 z-50 flex justify-center p-6 pointer-events-none"
+      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+      className="fixed top-0 left-0 right-0 z-50 px-3 md:px-6 pt-3 md:pt-6"
     >
-      <div className="w-full max-w-5xl flex items-center justify-between pointer-events-auto h-16 px-6 glass rounded-full">
-        {/* Logo */}
-        <div 
-          className="flex items-center gap-3 cursor-pointer group"
-          onClick={() => handleNavClick('home')}
+      {/* The Fixed Navigation - Floating Pill */}
+      <nav 
+        className="w-full max-w-4xl mx-auto px-3 md:px-6 py-2 md:py-3 flex items-center justify-between gap-2 md:gap-8"
+        style={{
+          background: 'rgba(255, 255, 255, 0.05)',
+          backdropFilter: 'blur(32px)',
+          WebkitBackdropFilter: 'blur(32px)',
+          borderRadius: '100px',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          boxShadow: '0 4px 24px rgba(0, 0, 0, 0.15)'
+        }}
+      >
+        {/* Left: Rodar Logo */}
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="flex items-center gap-2"
         >
-          <div className="w-8 h-8 rounded-lg bg-brand-accent flex items-center justify-center text-brand-deep font-bold text-xl group-hover:scale-110 transition-transform">
-            R
+          <div 
+            className="w-7 h-7 md:w-8 md:h-8 rounded-lg flex items-center justify-center"
+            style={{
+              background: '#00A86B',
+              boxShadow: '0 2px 8px rgba(0, 168, 107, 0.4)'
+            }}
+          >
+            <span className="text-white font-bold text-sm md:text-base">R</span>
           </div>
-          <span className="text-white font-display font-bold text-xl tracking-tight">Rodar</span>
-        </div>
+          <span 
+            className="text-white font-semibold text-sm md:text-base hidden sm:inline"
+            style={{
+              letterSpacing: '-0.01em'
+            }}
+          >
+            Rodar
+          </span>
+        </motion.div>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-8">
+        {/* Center: Navigation Links */}
+        <div className="flex items-center gap-3 md:gap-6">
           {navigation[language].map((item) => (
             <button
               key={item.id}
               onClick={() => handleNavClick(item.id)}
-              className={`text-sm font-medium transition-all hover:text-brand-accent ${
-                currentPage === item.id ? 'text-brand-accent' : 'text-white/60'
+              className={`text-[11px] md:text-sm font-medium transition-all duration-200 whitespace-nowrap ${
+                currentPage === item.id 
+                  ? 'text-white' 
+                  : 'text-white/60 hover:text-white'
               }`}
+              style={currentPage === item.id ? {
+                textShadow: '0 0 20px rgba(0, 168, 107, 0.8)'
+              } : {}}
             >
               {item.label}
             </button>
           ))}
-        </nav>
-
-        {/* Language & Actions */}
-        <div className="flex items-center gap-4">
-          <div className="flex bg-white/5 rounded-full p-1 border border-white/10">
-            <button
-              onClick={() => onLanguageChange('es')}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-all ${
-                language === 'es' ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white/60'
-              }`}
-            >
-              <DominicanFlag className="w-4 h-4" />
-              <span className="text-[10px] font-bold tracking-widest">ES</span>
-            </button>
-            <button
-              onClick={() => onLanguageChange('en')}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-all ${
-                language === 'en' ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white/60'
-              }`}
-            >
-              <USFlag className="w-4 h-4" />
-              <span className="text-[10px] font-bold tracking-widest">EN</span>
-            </button>
-          </div>
         </div>
-      </div>
+
+        {/* Right: Bilingual Toggle [ 🇩🇴 ES | 🇺🇸 EN ] */}
+        <div className="flex items-center gap-1 md:gap-2">
+          <button
+            onClick={() => onLanguageChange('es')}
+            className={`flex items-center gap-1 md:gap-1.5 px-1.5 md:px-2.5 py-1.5 rounded-lg transition-all duration-200 ${
+              language === 'es' 
+                ? 'opacity-100' 
+                : 'opacity-50 hover:opacity-75'
+            }`}
+            style={language === 'es' ? {
+              boxShadow: '0 0 16px rgba(0, 168, 107, 0.6)',
+              background: 'rgba(0, 168, 107, 0.15)'
+            } : {}}
+          >
+            <DominicanFlag size="sm" />
+            <span 
+              className="text-white text-[10px] md:text-xs font-bold hidden sm:inline"
+              style={{
+                letterSpacing: '0.05em'
+              }}
+            >
+              ES
+            </span>
+          </button>
+
+          <span className="text-white/30 text-xs font-light hidden sm:inline">|</span>
+
+          <button
+            onClick={() => onLanguageChange('en')}
+            className={`flex items-center gap-1 md:gap-1.5 px-1.5 md:px-2.5 py-1.5 rounded-lg transition-all duration-200 ${
+              language === 'en' 
+                ? 'opacity-100' 
+                : 'opacity-50 hover:opacity-75'
+            }`}
+            style={language === 'en' ? {
+              boxShadow: '0 0 16px rgba(0, 168, 107, 0.6)',
+              background: 'rgba(0, 168, 107, 0.15)'
+            } : {}}
+          >
+            <USFlag size="sm" />
+            <span 
+              className="text-white text-[10px] md:text-xs font-bold hidden sm:inline"
+              style={{
+                letterSpacing: '0.05em'
+              }}
+            >
+              EN
+            </span>
+          </button>
+        </div>
+      </nav>
     </motion.header>
   );
 }
