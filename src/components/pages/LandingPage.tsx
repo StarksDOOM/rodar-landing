@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion } from 'motion/react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
+import { getTranslations } from '../../lib/i18n';
 
 interface LandingPageProps {
   language: 'es' | 'en';
@@ -10,25 +11,7 @@ interface LandingPageProps {
 export function LandingPage({ language }: LandingPageProps) {
   const [email, setEmail] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
-
-  const text = {
-    es: {
-      headline: 'Muévete a tu ritmo.',
-      subheadline: 'La plataforma de movilidad compartida de la República Dominicana.',
-      waitlistBadge: 'LISTA DE ESPERA RODAR',
-      emailPlaceholder: 'Tu correo electrónico...',
-      cta: 'UNIRME',
-      thankYou: '¡Listo! Te contactaremos pronto.'
-    },
-    en: {
-      headline: 'Move at your own pace.',
-      subheadline: 'The Dominican Republic\'s car-sharing mobility platform.',
-      waitlistBadge: 'RODAR WAITLIST',
-      emailPlaceholder: 'Your email address...',
-      cta: 'JOIN',
-      thankYou: 'Done! We\'ll contact you soon.'
-    }
-  };
+  const t = getTranslations(language);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,7 +60,7 @@ export function LandingPage({ language }: LandingPageProps) {
                 letterSpacing: '-0.02em'
               }}
             >
-              {text[language].headline}
+              {t.landing.headline}
             </motion.h1>
 
             <motion.p
@@ -94,7 +77,7 @@ export function LandingPage({ language }: LandingPageProps) {
                 letterSpacing: '-0.01em'
               }}
             >
-              {text[language].subheadline}
+              {t.landing.subheadline}
             </motion.p>
           </div>
         </div>
@@ -131,14 +114,14 @@ export function LandingPage({ language }: LandingPageProps) {
                         textTransform: 'uppercase'
                       }}
                     >
-                      {text[language].waitlistBadge}
+                      {t.landing.waitlistBadge}
                     </span>
                   </div>
 
                   {/* Input - with background */}
                   <Input
                     type="email"
-                    placeholder={text[language].emailPlaceholder}
+                    placeholder={t.landing.emailPlaceholder}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full h-14 border-0 text-white placeholder:text-white/50 focus-visible:ring-0 focus-visible:ring-offset-0 px-5 text-center"
@@ -164,7 +147,7 @@ export function LandingPage({ language }: LandingPageProps) {
                       boxShadow: '0 4px 24px rgba(255, 215, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.5)'
                     }}
                   >
-                    {text[language].cta}
+                    {t.landing.cta}
                   </Button>
                 </div>
 
@@ -197,14 +180,14 @@ export function LandingPage({ language }: LandingPageProps) {
                         textTransform: 'uppercase'
                       }}
                     >
-                      {text[language].waitlistBadge}
+                      {t.landing.waitlistBadge}
                     </span>
                   </div>
 
                   {/* Input */}
                   <Input
                     type="email"
-                    placeholder={text[language].emailPlaceholder}
+                    placeholder={t.landing.emailPlaceholder}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="flex-1 h-auto border-0 bg-transparent text-white placeholder:text-white/50 focus-visible:ring-0 focus-visible:ring-offset-0 px-4"
@@ -228,7 +211,7 @@ export function LandingPage({ language }: LandingPageProps) {
                       boxShadow: '0 4px 24px rgba(255, 215, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.5)'
                     }}
                   >
-                    {text[language].cta}
+                    {t.landing.cta}
                   </Button>
                 </div>
               </form>
@@ -251,7 +234,7 @@ export function LandingPage({ language }: LandingPageProps) {
                 >
                   <span className="text-white text-base font-bold">✓</span>
                 </div>
-                <span className="text-white font-semibold text-sm sm:text-base">{text[language].thankYou}</span>
+                <span className="text-white font-semibold text-sm sm:text-base">{t.landing.thankYou}</span>
               </div>
             )}
           </motion.div>

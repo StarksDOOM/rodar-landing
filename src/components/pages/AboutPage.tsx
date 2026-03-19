@@ -1,64 +1,12 @@
 import { motion } from 'motion/react';
+import { getTranslations } from '../../lib/i18n';
 
 interface AboutPageProps {
   language: 'es' | 'en';
 }
 
 export function AboutPage({ language }: AboutPageProps) {
-  const text = {
-    es: {
-      title: 'Sobre Rodar',
-      intro: 'Rodar es la plataforma de movilidad compartida de República Dominicana, operada por FulCastle Holdings, Inc. — conectando dueños de vehículos con personas que necesitan alquilarlos de manera segura, verificada y 100% digital.',
-      mission: {
-        title: 'Nuestra Misión',
-        description: 'Transformar el ecosistema de movilidad dominicano mediante tecnología peer-to-peer que prioriza seguridad, transparencia y acceso equitativo al transporte.'
-      },
-      compliance: {
-        title: 'Cumplimiento Legal',
-        items: [
-          'Operación bajo Ley 63-17 de Movilidad, Transporte Terrestre, Tránsito y Seguridad Vial de la República Dominicana',
-          'Verificación KYC (Know Your Customer) completa para todos los usuarios',
-          'Cobertura de seguro integral en cada transacción',
-          'Incorporación Delaware, USA — 8 The Green, Ste B, Dover, DE 19901'
-        ]
-      },
-      values: {
-        title: 'Valores Institucionales',
-        items: [
-          'Seguridad y Confianza — Verificación rigurosa de usuarios y vehículos',
-          'Transparencia — Precios claros, sin tarifas ocultas',
-          'Tecnología Accesible — Plataforma 100% digital, sin papeleos',
-          'Comunidad Responsable — Construyendo un ecosistema colaborativo'
-        ]
-      }
-    },
-    en: {
-      title: 'About Rodar',
-      intro: 'Rodar is the Dominican Republic\'s car-sharing mobility platform, operated by FulCastle Holdings, Inc. — connecting vehicle owners with people who need to rent them in a safe, verified, and 100% digital manner.',
-      mission: {
-        title: 'Our Mission',
-        description: 'Transform the Dominican mobility ecosystem through peer-to-peer technology that prioritizes security, transparency, and equitable access to transportation.'
-      },
-      compliance: {
-        title: 'Legal Compliance',
-        items: [
-          'Operating under Law 63-17 for Mobility, Land Transport, Traffic and Road Safety of the Dominican Republic',
-          'Complete KYC (Know Your Customer) verification for all users',
-          'Comprehensive insurance coverage on every transaction',
-          'Delaware, USA Incorporation — 8 The Green, Ste B, Dover, DE 19901'
-        ]
-      },
-      values: {
-        title: 'Institutional Values',
-        items: [
-          'Safety and Trust — Rigorous verification of users and vehicles',
-          'Transparency — Clear pricing, no hidden fees',
-          'Accessible Technology — 100% digital platform, no paperwork',
-          'Responsible Community — Building a collaborative ecosystem'
-        ]
-      }
-    }
-  };
+  const t = getTranslations(language);
 
   return (
     <div 
@@ -111,7 +59,7 @@ export function AboutPage({ language }: AboutPageProps) {
                 lineHeight: '1.2'
               }}
             >
-              {text[language].title}
+              {t.about.title}
             </h1>
 
             {/* Introduction */}
@@ -125,7 +73,7 @@ export function AboutPage({ language }: AboutPageProps) {
                 letterSpacing: '0.01em'
               }}
             >
-              {text[language].intro}
+              {t.about.intro}
             </p>
 
             {/* Mission */}
@@ -140,7 +88,7 @@ export function AboutPage({ language }: AboutPageProps) {
                   color: '#00A86B'
                 }}
               >
-                {text[language].mission.title}
+                {t.about.mission.title}
               </h2>
               <p 
                 className="text-white/70"
@@ -151,7 +99,7 @@ export function AboutPage({ language }: AboutPageProps) {
                   letterSpacing: '0.01em'
                 }}
               >
-                {text[language].mission.description}
+                {t.about.mission.description}
               </p>
             </div>
 
@@ -175,10 +123,10 @@ export function AboutPage({ language }: AboutPageProps) {
                   color: '#00A86B'
                 }}
               >
-                {text[language].compliance.title}
+                {t.about.compliance.title}
               </h2>
               <div className="space-y-4">
-                {text[language].compliance.items.map((item, index) => (
+                {t.about.compliance.items.map((item, index) => (
                   <div key={index} className="flex items-start gap-3">
                     <div 
                       className="w-1.5 h-1.5 rounded-full mt-2.5 shrink-0"
@@ -222,10 +170,10 @@ export function AboutPage({ language }: AboutPageProps) {
                   color: '#00A86B'
                 }}
               >
-                {text[language].values.title}
+                {t.about.values.title}
               </h2>
               <div className="space-y-4">
-                {text[language].values.items.map((item, index) => (
+                {t.about.values.items.map((item, index) => (
                   <div key={index} className="flex items-start gap-3">
                     <div 
                       className="w-1.5 h-1.5 rounded-full mt-2.5 shrink-0"
