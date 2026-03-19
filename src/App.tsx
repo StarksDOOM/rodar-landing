@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { LandingPage } from './components/pages/LandingPage';
+import { AboutPage } from './components/pages/AboutPage';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -9,7 +10,10 @@ export default function App() {
 
   const renderPage = () => {
     switch (currentPage) {
-      // In follow-up feature branches, other pages will be registered here.
+      case 'home':
+        return <LandingPage language={language} />;
+      case 'about':
+        return <AboutPage language={language} />;
       default:
         return <LandingPage language={language} />;
     }
