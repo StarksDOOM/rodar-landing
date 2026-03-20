@@ -2,10 +2,20 @@ import { motion } from 'motion/react';
 import { getTranslations } from '../lib/i18n';
 
 interface FooterProps {
+  /** The current language code ('es' or 'en'). */
   language: 'es' | 'en';
+  /** Callback to trigger a page change in the root App state. */
+  onPageChange: (page: string) => void;
 }
 
-export function Footer({ language }: FooterProps) {
+/**
+ * Footer Component.
+ * Fixed-bottom institutional footer containing corporate info, contact, and legal links.
+ * Uses a glassmorphic design and SF Mono typography for a technical, premium feel.
+ * 
+ * @param props - Footer properties including language and navigation callback.
+ */
+export function Footer({ language, onPageChange }: FooterProps) {
   const t = getTranslations(language);
 
   return (
@@ -55,19 +65,19 @@ export function Footer({ language }: FooterProps) {
 
             {/* Right: Legal Links */}
             <div className="md:text-right">
-              <a 
-                href="#" 
-                className="hover:text-white transition-colors duration-200"
+              <button 
+                onClick={() => onPageChange('terms')}
+                className="hover:text-white transition-colors duration-200 uppercase"
               >
                 {t.footer.legal.terms}
-              </a>
+              </button>
               {' | '}
-              <a 
-                href="#" 
-                className="hover:text-white transition-colors duration-200"
+              <button 
+                onClick={() => onPageChange('privacy')}
+                className="hover:text-white transition-colors duration-200 uppercase"
               >
                 {t.footer.legal.privacy}
-              </a>
+              </button>
             </div>
 
           </motion.div>

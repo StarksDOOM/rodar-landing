@@ -4,6 +4,8 @@ import { Footer } from './components/Footer';
 import { LandingPage } from './components/pages/LandingPage';
 import { AboutPage } from './components/pages/AboutPage';
 import { ContactPage } from './components/pages/ContactPage';
+import { TermsPage } from './components/pages/TermsPage';
+import { PrivacyPage } from './components/pages/PrivacyPage';
 
 /**
  * Root Application Component.
@@ -14,7 +16,7 @@ import { ContactPage } from './components/pages/ContactPage';
  */
 export default function App() {
   /**
-   * State to track the active page ('home', 'about', or 'contact').
+   * State to track the active page ('home', 'about', 'contact', 'terms', or 'privacy').
    */
   const [currentPage, setCurrentPage] = useState('home');
 
@@ -34,6 +36,10 @@ export default function App() {
         return <AboutPage language={language} />;
       case 'contact':
         return <ContactPage language={language} />;
+      case 'terms':
+        return <TermsPage language={language} />;
+      case 'privacy':
+        return <PrivacyPage language={language} />;
       default:
         return <LandingPage language={language} />;
     }
@@ -50,7 +56,10 @@ export default function App() {
       
       {renderPage()}
       
-      <Footer language={language} />
+      <Footer 
+        language={language} 
+        onPageChange={setCurrentPage} 
+      />
     </div>
   );
 }
