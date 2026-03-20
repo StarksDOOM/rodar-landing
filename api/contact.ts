@@ -1,6 +1,13 @@
 import { Resend } from 'resend';
 
-// Vercel Serverless Function Handler
+/**
+ * Vercel Serverless Function Handler for processing contact form submissions.
+ * Uses the Resend API to send internal notification emails.
+ * 
+ * @param req - Incoming Vercel request object (expected POST with name, email, and message).
+ * @param res - Outgoing Vercel response object.
+ * @returns A JSON response indicating success or a specific error message.
+ */
 export default async function handler(req: any, res: any) {
   // Only allow POST requests
   if (req.method !== 'POST') {
@@ -9,7 +16,7 @@ export default async function handler(req: any, res: any) {
 
   const { name, email, message } = req.body;
 
-  // Basic validation
+  // Basic validation for required contact fields
   if (!name || !email || !message) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
@@ -17,6 +24,7 @@ export default async function handler(req: any, res: any) {
   const resend = new Resend(process.env.RESEND_API_KEY);
 
   try {
+    // Send email using Resend
     const { data, error } = await resend.emails.send({
       from: 'Rodar Contact <onboarding@resend.dev>',
       to: 'rmansempire@gmail.com',

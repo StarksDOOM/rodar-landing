@@ -5,22 +5,47 @@ import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
 import { getTranslations } from '../../lib/i18n';
 
+/**
+ * Props for the ContactPage component.
+ */
 interface ContactPageProps {
+  /** The current language code ('es' or 'en'). */
   language: 'es' | 'en';
 }
 
+/**
+ * ContactPage Component.
+ * Provides a contact form for users to send messages to Rodar.
+ * Includes localized inputs, basic validation, and integration with the /api/contact endpoint.
+ * 
+ * @param props - Component properties including the active language.
+ * @returns A scrollable page with a message form and localized contact information.
+ */
 export function ContactPage({ language }: ContactPageProps) {
+  /** 
+   * Local form state for name, email, and message.
+   */
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     message: ''
   });
+  /** Tracks loading state during message submission. */
   const [isSubmitting, setIsSubmitting] = useState(false);
+  /** Tracks if the message was successfully sent. */
   const [isSubmitted, setIsSubmitted] = useState(false);
+  /** Stores any error messages during the submission process. */
   const [error, setError] = useState<string | null>(null);
   
+  /** Localized translation helper. */
   const t = getTranslations(language);
 
+  /**
+   * Handles the contact form submission.
+   * Sends the form data to the /api/contact serverless function.
+   * 
+   * @param e - The form submission event.
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -50,6 +75,12 @@ export function ContactPage({ language }: ContactPageProps) {
     }
   };
 
+  /**
+   * Updates specific fields in the local form state.
+   * 
+   * @param field - The field name to update.
+   * @param value - The new value for the field.
+   */
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };

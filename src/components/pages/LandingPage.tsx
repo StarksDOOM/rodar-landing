@@ -4,17 +4,40 @@ import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { getTranslations } from '../../lib/i18n';
 
+/**
+ * Props for the LandingPage component.
+ */
 interface LandingPageProps {
+  /** The current language code ('es' or 'en'). */
   language: 'es' | 'en';
 }
 
+/**
+ * LandingPage Component (Home).
+ * Displays a cinematic hero section with a Samaná-inspired background and a "Coming Soon" waitlist form.
+ * 
+ * @param props - Component properties including the active language.
+ * @returns A full-screen page with an atmospheric hero message and a waitlist join form.
+ */
 export function LandingPage({ language }: LandingPageProps) {
+  /** State for the email input field. */
   const [email, setEmail] = useState('');
+  /** Tracks if the user has successfully joined the waitlist. */
   const [isJoined, setIsJoined] = useState(false);
+  /** Tracks the loading state during form submission. */
   const [isSubmitting, setIsSubmitting] = useState(false);
+  /** Stores any error messages encountered during submission. */
   const [error, setError] = useState<string | null>(null);
+  
+  /** Localized translation helper. */
   const t = getTranslations(language);
 
+  /**
+   * Handles the waitlist form submission.
+   * Validates the email and calls the /api/subscribe serverless function.
+   * 
+   * @param e - The form submission event.
+   */
   const handleWaitlistSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (email && /^\S+@\S+\.\S+$/.test(email)) {

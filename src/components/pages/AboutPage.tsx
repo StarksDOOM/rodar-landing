@@ -1,11 +1,24 @@
 import { motion } from 'motion/react';
 import { getTranslations } from '../../lib/i18n';
 
+/**
+ * Props for the AboutPage component.
+ */
 interface AboutPageProps {
+  /** The current language code ('es' or 'en'). */
   language: 'es' | 'en';
 }
 
+/**
+ * AboutPage Component.
+ * Displays institutional information about Rodar, including its mission, legal compliance, 
+ * and core values. Features a fixed atmospheric background with a glassmorphism overlay.
+ * 
+ * @param props - Component properties including the active language.
+ * @returns A scrollable page with localized institutional content.
+ */
 export function AboutPage({ language }: AboutPageProps) {
+  /** Localized translation helper. */
   const t = getTranslations(language);
 
   return (
