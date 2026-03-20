@@ -10,14 +10,39 @@ interface LandingPageProps {
 
 export function LandingPage({ language }: LandingPageProps) {
   const [email, setEmail] = useState('');
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isJoined, setIsJoined] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const t = getTranslations(language);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleWaitlistSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email) {
-      setIsSubmitted(true);
-      console.log('Waitlist submission:', { email });
+    if (email && /^\S+@\S+\.\S+$/.test(email)) {
+      setIsSubmitting(true);
+      setError(null);
+      
+      try {
+        const response = await fetch('/api/subscribe', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email }),
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          setIsJoined(true);
+        } else {
+          throw new Error(result.error || 'Failed to join waitlist');
+        }
+      } catch (err: any) {
+        console.error('Waitlist Error:', err);
+        setError(err.message || 'Something went wrong. Please try again.');
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -89,8 +114,8 @@ export function LandingPage({ language }: LandingPageProps) {
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 1.2, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
           >
-            {!isSubmitted ? (
-              <form onSubmit={handleSubmit}>
+            {!isJoined ? (
+              <form onSubmit={handleWaitlistSubmit} className="relative">
                 {/* Mobile Layout */}
                 <div 
                   className="flex sm:hidden flex-col gap-2.5 p-2.5"
@@ -124,6 +149,7 @@ export function LandingPage({ language }: LandingPageProps) {
                     placeholder={t.landing.emailPlaceholder}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    disabled={isSubmitting}
                     className="w-full h-14 border-0 text-white placeholder:text-white/50 focus-visible:ring-0 focus-visible:ring-offset-0 px-5 text-center"
                     style={{
                       background: 'rgba(255, 255, 255, 0.15)',
@@ -137,6 +163,7 @@ export function LandingPage({ language }: LandingPageProps) {
                   {/* Button */}
                   <Button
                     type="submit"
+                    disabled={isSubmitting}
                     className="w-full h-14 font-bold text-black hover:scale-[1.02] transition-transform duration-200"
                     style={{
                       background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)',
@@ -147,7 +174,7 @@ export function LandingPage({ language }: LandingPageProps) {
                       boxShadow: '0 4px 24px rgba(255, 215, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.5)'
                     }}
                   >
-                    {t.landing.cta}
+                    {isSubmitting ? '...' : t.landing.cta}
                   </Button>
                 </div>
 
@@ -190,6 +217,7 @@ export function LandingPage({ language }: LandingPageProps) {
                     placeholder={t.landing.emailPlaceholder}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    disabled={isSubmitting}
                     className="flex-1 h-auto border-0 bg-transparent text-white placeholder:text-white/50 focus-visible:ring-0 focus-visible:ring-offset-0 px-4"
                     style={{
                       fontSize: '15px',
@@ -201,6 +229,7 @@ export function LandingPage({ language }: LandingPageProps) {
                   {/* Button */}
                   <Button
                     type="submit"
+                    disabled={isSubmitting}
                     className="h-11 px-7 shrink-0 font-bold text-black hover:scale-105 transition-transform duration-200"
                     style={{
                       background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)',
@@ -211,11 +240,19 @@ export function LandingPage({ language }: LandingPageProps) {
                       boxShadow: '0 4px 24px rgba(255, 215, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.5)'
                     }}
                   >
-                    {t.landing.cta}
+                    {isSubmitting ? '...' : t.landing.cta}
                   </Button>
                 </div>
+                
+                {/* Error Message */}
+                {error && (
+                  <p className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-red-300 text-[10px] md:text-xs whitespace-nowrap">
+                    {error}
+                  </p>
+                )}
               </form>
             ) : (
+              /* Success State */
               <div 
                 className="flex items-center justify-center gap-3 px-6 py-4 h-16"
                 style={{
