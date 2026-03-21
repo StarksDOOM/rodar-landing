@@ -199,14 +199,10 @@ export function LandingPage({ language }: LandingPageProps) {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     disabled={isSubmitting}
-                    className="w-full h-14 border-0 text-white placeholder:text-white/50 focus-visible:ring-0 focus-visible:ring-offset-0 px-5 text-center"
-                    style={{
-                      background: 'rgba(255, 255, 255, 0.15)',
-                      borderRadius: '24px',
-                      fontSize: '15px',
-                      fontWeight: 400
-                    }}
+                    className="w-full h-14 md:h-16 px-6 md:px-8 text-white border-0 placeholder:text-white/40 mb-4 bg-white/5 backdrop-blur-md rounded-2xl border-white/10"
                     required
+                    onInvalid={(e: any) => e.target.setCustomValidity(t.landing.invalidEmailError)}
+                    onInput={(e: any) => e.target.setCustomValidity('')}
                   />
 
                   {/* Button */}

@@ -208,6 +208,8 @@ export function ContactPage({ language }: ContactPageProps) {
                         fontSize: '15px'
                       }}
                       required
+                      onInvalid={(e: any) => e.target.setCustomValidity(t.contact.form.errors.nameRequired)}
+                      onInput={(e: any) => e.target.setCustomValidity('')}
                     />
                   </div>
 
@@ -227,6 +229,8 @@ export function ContactPage({ language }: ContactPageProps) {
                         fontSize: '15px'
                       }}
                       required
+                      onInvalid={(e: any) => e.target.setCustomValidity(t.contact.form.errors.emailInvalid)}
+                      onInput={(e: any) => e.target.setCustomValidity('')}
                     />
                   </div>
 
@@ -245,6 +249,8 @@ export function ContactPage({ language }: ContactPageProps) {
                         fontSize: '15px'
                       }}
                       required
+                      onInvalid={(e: any) => e.target.setCustomValidity(t.contact.form.errors.messageRequired)}
+                      onInput={(e: any) => e.target.setCustomValidity('')}
                     />
                   </div>
 
