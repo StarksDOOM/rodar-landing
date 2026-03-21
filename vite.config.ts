@@ -50,6 +50,9 @@ const apiPlugin = () => ({
 
           // Mock response object
           const mockRes = {
+            setHeader: (name: string, value: string) => {
+              res.setHeader(name, value)
+            },
             status: (code: number) => ({
               json: (data: any) => {
                 res.statusCode = code
