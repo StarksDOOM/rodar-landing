@@ -23,7 +23,10 @@
     "cta": "Request Early Access",
     "thankYou": "Done! We'll contact you soon.",
     "invalidEmailError": "Please enter a valid email address.",
-    "error": "Failed to join waitlist. Please try again."
+    "error": "Failed to join waitlist. Please try again.",
+    "validation": {
+      "required": "Please fill out this field"
+    }
   },
   "about": {
     "title": "About Rodar",

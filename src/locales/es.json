@@ -23,7 +23,10 @@
     "cta": "Solicitar Acceso",
     "thankYou": "¡Listo! Te contactaremos pronto.",
     "invalidEmailError": "Por favor ingresa un correo electrónico válido.",
-    "error": "Error al unirse a la lista de espera. Por favor, inténtalo de nuevo."
+    "error": "Error al unirse a la lista de espera. Por favor, inténtalo de nuevo.",
+    "validation": {
+      "required": "Por favor, completa este campo"
+    }
   },
   "about": {
     "title": "Sobre Rodar",

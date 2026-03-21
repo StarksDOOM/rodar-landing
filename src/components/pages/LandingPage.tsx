@@ -55,7 +55,10 @@ export function LandingPage({ language }: LandingPageProps) {
       copyright: '© 2026 FULCASTLE HOLDINGS, INC.',
       support: 'SUPPORT@RODAR.DO',
       terms: 'TÉRMINOS DE SERVICIO',
-      privacy: 'POLÍTICA DE PRIVACIDAD'
+      privacy: 'POLÍTICA DE PRIVACIDAD',
+      validation: {
+        required: 'Por favor, completa este campo'
+      }
     },
     en: {
       headline: 'Move at your own pace.',
@@ -71,7 +74,10 @@ export function LandingPage({ language }: LandingPageProps) {
       copyright: '© 2026 FULCASTLE HOLDINGS, INC.',
       support: 'SUPPORT@RODAR.DO',
       terms: 'TERMS OF SERVICE',
-      privacy: 'PRIVACY POLICY'
+      privacy: 'PRIVACY POLICY',
+      validation: {
+        required: 'Please fill out this field'
+      }
     }
   };
 
@@ -315,6 +321,8 @@ export function LandingPage({ language }: LandingPageProps) {
                             fontWeight: 400
                           }}
                           required
+                          onInvalid={(e: any) => e.target.setCustomValidity(text[language].validation.required)}
+                          onInput={(e: any) => e.target.setCustomValidity('')}
                         />
 
                         {/* Last Name */}
@@ -331,6 +339,8 @@ export function LandingPage({ language }: LandingPageProps) {
                             fontWeight: 400
                           }}
                           required
+                          onInvalid={(e: any) => e.target.setCustomValidity(text[language].validation.required)}
+                          onInput={(e: any) => e.target.setCustomValidity('')}
                         />
 
                         {/* Date of Birth */}
@@ -348,6 +358,8 @@ export function LandingPage({ language }: LandingPageProps) {
                             colorScheme: 'dark'
                           }}
                           required
+                          onInvalid={(e: any) => e.target.setCustomValidity(text[language].validation.required)}
+                          onInput={(e: any) => e.target.setCustomValidity('')}
                         />
 
                         {/* Email */}
@@ -364,6 +376,8 @@ export function LandingPage({ language }: LandingPageProps) {
                             fontWeight: 400
                           }}
                           required
+                          onInvalid={(e: any) => e.target.setCustomValidity(text[language].validation.required)}
+                          onInput={(e: any) => e.target.setCustomValidity('')}
                         />
 
                         {/* Button */}
@@ -451,6 +465,8 @@ export function LandingPage({ language }: LandingPageProps) {
                       fontWeight: 400
                     }}
                     required
+                    onInvalid={(e: any) => e.target.setCustomValidity(text[language].validation.required)}
+                    onInput={(e: any) => e.target.setCustomValidity('')}
                   />
 
                   {/* Last Name */}
@@ -465,6 +481,8 @@ export function LandingPage({ language }: LandingPageProps) {
                       fontWeight: 400
                     }}
                     required
+                    onInvalid={(e: any) => e.target.setCustomValidity(text[language].validation.required)}
+                    onInput={(e: any) => e.target.setCustomValidity('')}
                   />
 
                   {/* Date of Birth */}
@@ -479,6 +497,8 @@ export function LandingPage({ language }: LandingPageProps) {
                       colorScheme: 'dark'
                     }}
                     required
+                    onInvalid={(e: any) => e.target.setCustomValidity(text[language].validation.required)}
+                    onInput={(e: any) => e.target.setCustomValidity('')}
                   />
 
                   {/* Email */}
@@ -493,6 +513,8 @@ export function LandingPage({ language }: LandingPageProps) {
                       fontWeight: 400
                     }}
                     required
+                    onInvalid={(e: any) => e.target.setCustomValidity(text[language].validation.required)}
+                    onInput={(e: any) => e.target.setCustomValidity('')}
                   />
 
                   {/* Button */}
