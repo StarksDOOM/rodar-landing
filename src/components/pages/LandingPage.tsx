@@ -30,9 +30,11 @@ export function LandingPage({ language }: LandingPageProps) {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
+    middleName: '', // Honeypot field - bots will fill this
     dob: '',
     email: ''
   });
+  const [formMountedAt] = useState(Date.now()); // Capture when the form was initially rendered
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isMobileFormExpanded, setIsMobileFormExpanded] = useState(false);
@@ -87,7 +89,10 @@ export function LandingPage({ language }: LandingPageProps) {
         const response = await fetch('/api/subscribe', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData),
+          body: JSON.stringify({
+            ...formData,
+            ms: Date.now() - formMountedAt // Send the time elapsed since form was mounted (timing check)
+          }),
         });
 
         if (response.ok) {
@@ -284,6 +289,18 @@ export function LandingPage({ language }: LandingPageProps) {
                           </span>
                         </div>
 
+                        {/* Middle Name (Honeypot) - Hidden from humans */}
+                        <div className="opacity-0 absolute pointer-events-none h-0 w-0 overflow-hidden">
+                          <Input
+                            type="text"
+                            name="middleName"
+                            autoComplete="off"
+                            tabIndex={-1}
+                            value={formData.middleName}
+                            onChange={(e) => handleInputChange('middleName', e.target.value)}
+                          />
+                        </div>
+
                         {/* First Name */}
                         <Input
                           type="text"
@@ -408,6 +425,18 @@ export function LandingPage({ language }: LandingPageProps) {
                     >
                       {text[language].waitlistBadge}
                     </span>
+                  </div>
+
+                  {/* Middle Name (Honeypot) - Hidden from humans */}
+                  <div className="opacity-0 absolute pointer-events-none h-0 w-0 overflow-hidden">
+                    <Input
+                      type="text"
+                      name="middleName"
+                      autoComplete="off"
+                      tabIndex={-1}
+                      value={formData.middleName}
+                      onChange={(e) => handleInputChange('middleName', e.target.value)}
+                    />
                   </div>
 
                   {/* First Name */}
