@@ -60,13 +60,28 @@ export function ContactPage({ language }: ContactPageProps) {
         body: JSON.stringify(formData),
       });
 
-      const result = await response.json();
-
-      if (response.ok) {
-        setIsSubmitted(true);
-      } else {
-        throw new Error(result.error || 'Failed to send message');
+      if (!response.ok) {
+        let errorMessage = 'Failed to send message';
+        try {
+          const text = await response.text();
+          try {
+            const result = JSON.parse(text);
+          const errorData = result.error || result.message;
+          if (typeof errorData === 'object') {
+            errorMessage = errorData.message || JSON.stringify(errorData);
+          } else {
+            errorMessage = errorData || errorMessage;
+          }
+          } catch (e) {
+            errorMessage = text || errorMessage;
+          }
+        } catch (e) {
+          // ignore
+        }
+        throw new Error(errorMessage);
       }
+
+      setIsSubmitted(true);
     } catch (err: any) {
       console.error('Submission Error:', err);
       setError(err.message || 'Something went wrong. Please try again.');
