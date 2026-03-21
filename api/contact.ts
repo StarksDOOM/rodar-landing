@@ -45,7 +45,7 @@ export default async function handler(req: any, res: any) {
   try {
     // Send email using Resend
     const { data, error } = await resend.emails.send({
-      from: 'Rodar Contact <hola@rodar.do>',
+      from: 'Rodar <hola@rodar.do>',
       to: ['rmansempire@gmail.com', 'leo.fulgencio@gmail.com'],
       subject: `Rodar Message from: ${trimmedName}`,
       text: `Name: ${trimmedName}\nEmail: ${trimmedEmail}\n\n${trimmedMessage}`,
