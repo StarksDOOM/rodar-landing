@@ -45,18 +45,11 @@ export default async function handler(req: any, res: any) {
     return res.status(400).json({ error: 'Valid message is required (max 5000 chars)' });
   }
 
-  // Debug: Confirm environment variables are present
+  // Check environment variables
   const resendApiKey = process.env.RESEND_API_KEY || process.env.VITE_RESEND_API_KEY;
-  const hasResendKey = !!resendApiKey;
-  
-  if (!hasResendKey) {
-    console.error('RESEND_CONFIG_ERROR: hasResendKey: false', {
-      envKeys: Object.keys(process.env).filter(k => k.includes('RESEND'))
-    });
-    return res.status(500).json({ 
-      error: 'Resend configuration is missing in environment.',
-      details: { hasResendKey }
-    });
+  if (!resendApiKey) {
+    console.error('RESEND_CONFIG_ERROR: API Key missing');
+    return res.status(500).json({ error: 'Resend configuration is missing in environment.' });
   }
 
   const resend = new Resend(resendApiKey);
@@ -66,6 +59,7 @@ export default async function handler(req: any, res: any) {
     const { data, error } = await resend.emails.send({
       from: 'Rodar <hola@rodar.do>',
       to: ['rmansempire@gmail.com', 'leo.fulgencio@gmail.com'],
+      replyTo: trimmedEmail,
       subject: `Rodar Message from: ${trimmedName}`,
       text: `Name: ${trimmedName}\nEmail: ${trimmedEmail}\n\n${trimmedMessage}`,
     });
