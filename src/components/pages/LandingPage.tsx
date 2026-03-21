@@ -1,97 +1,119 @@
 import { useState } from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
-import { getTranslations } from '../../lib/i18n';
+import { X } from 'lucide-react';
 
-/**
- * Props for the LandingPage component.
- */
 interface LandingPageProps {
-  /** The current language code ('es' or 'en'). */
   language: 'es' | 'en';
 }
 
 /**
- * LandingPage Component (Home).
- * Displays a cinematic hero section with a Samaná-inspired background and a "Coming Soon" waitlist form.
+ * LandingPage Component
  * 
- * @param props - Component properties including the active language.
- * @returns A full-screen page with an atmospheric hero message and a waitlist join form.
+ * A pixel-perfect restoration of the Rodar.do landing page based on the user's master design snippet.
+ * This component features:
+ * - A high-performance background image with a dynamic atmospheric overlay.
+ * - Framer Motion animations for fluid HERO messaging and waitlist transitions.
+ * - A dual-layout waitlist form:
+ *   - Desktop: A compact, single-row pill layout with glassmorphic styling.
+ *   - Mobile: A responsive, collapsible form that expands into a full-width card.
+ * - Technical Fixes:
+ *   - Forced white placeholders using high-specificity CSS to override browser/component defaults.
+ *   - Refined mobile proportions (smaller inputs/buttons) for a premium handheld experience.
+ *   - Robust Mailchimp integration with /api/subscribe.
+ * 
+ * @param {LandingPageProps} props - Component props containing the current language ('es' | 'en').
+ * @returns {JSX.Element} The rendered landing page.
  */
 export function LandingPage({ language }: LandingPageProps) {
-  /** State for the email input field. */
-  const [email, setEmail] = useState('');
-  /** Tracks if the user has successfully joined the waitlist. */
-  const [isJoined, setIsJoined] = useState(false);
-  /** Tracks the loading state during form submission. */
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    dob: '',
+    email: ''
+  });
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  /** Stores any error messages encountered during submission. */
+  const [isMobileFormExpanded, setIsMobileFormExpanded] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
-  /** Localized translation helper. */
-  const t = getTranslations(language);
 
-  /**
-   * Handles the waitlist form submission.
-   * Validates the email and calls the /api/subscribe serverless function.
-   * 
-   * @param e - The form submission event.
-   */
+  const text = {
+    es: {
+      headline: 'Muévete a tu ritmo.',
+      subheadline: 'La plataforma de movilidad compartida de la República Dominicana.',
+      waitlistBadge: 'LISTA DE ESPERA RODAR',
+      firstNamePlaceholder: 'Nombre',
+      lastNamePlaceholder: 'Apellido',
+      dobPlaceholder: 'mm/dd/yyyy',
+      emailPlaceholder: 'Tu mejor correo...',
+      cta: 'Solicitar Acceso',
+      thankYou: '¡Listo! Te contactaremos pronto.',
+      error: 'Error al unirse a la lista de espera. Por favor, inténtalo de nuevo.',
+      copyright: '© 2026 FULCASTLE HOLDINGS, INC.',
+      support: 'SUPPORT@RODAR.DO',
+      terms: 'TÉRMINOS DE SERVICIO',
+      privacy: 'POLÍTICA DE PRIVACIDAD'
+    },
+    en: {
+      headline: 'Move at your own pace.',
+      subheadline: 'The shared mobility platform of the Dominican Republic.',
+      waitlistBadge: 'RODAR WAITLIST',
+      firstNamePlaceholder: 'First Name',
+      lastNamePlaceholder: 'Last Name',
+      dobPlaceholder: 'mm/dd/yyyy',
+      emailPlaceholder: 'Your best email...',
+      cta: 'Request Access',
+      thankYou: 'Done! We will contact you soon.',
+      error: 'Error joining waitlist. Please try again.',
+      copyright: '© 2026 FULCASTLE HOLDINGS, INC.',
+      support: 'SUPPORT@RODAR.DO',
+      terms: 'TERMS OF SERVICE',
+      privacy: 'PRIVACY POLICY'
+    }
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
   const handleWaitlistSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Initial check for non-empty email, more robust validation follows
-    if (email) { 
+    if (formData.firstName && formData.lastName && formData.dob && formData.email) {
       setIsSubmitting(true);
       setError(null);
-      
-      const trimmedEmail = email.trim();
-    
-      // Email regex validation
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(trimmedEmail)) {
-        setError(t.landing.invalidEmailError); // Using existing error state
-        setIsSubmitting(false); // Stop loading state
-        return;
-      }
 
-     try {
-      const response = await fetch('/api/subscribe', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: trimmedEmail, // Use trimmedEmail here
-        }),
-      });
+      try {
+        const response = await fetch('/api/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData),
+        });
 
-      if (!response.ok) {
-        let errorMessage = t.landing.error;
-        try {
-          const text = await response.text();
-          // Safely check if the response is JSON before parsing
-          if (text && (text.trim().startsWith('{') || text.trim().startsWith('['))) {
-            const result = JSON.parse(text);
-            errorMessage = result.error || result.message || errorMessage;
-          } else if (text && text.length < 200 && !text.includes('<!DOCTYPE')) {
-            // If it's a short non-HTML string, use it
-            errorMessage = text;
+        if (response.ok) {
+          setIsSubmitted(true);
+        } else {
+          let errorMessage = text[language].error;
+          try {
+            const resText = await response.text();
+            if (resText && (resText.trim().startsWith('{') || resText.trim().startsWith('['))) {
+              const result = JSON.parse(resText);
+              errorMessage = result.error || result.message || errorMessage;
+            } else if (resText && resText.length < 200 && !resText.includes('<!DOCTYPE')) {
+              errorMessage = resText;
+            }
+          } catch (e) {
+            console.error('Failed to parse error response:', e);
           }
-        } catch (e) {
-          console.error('Failed to parse error response:', e);
+          throw new Error(errorMessage);
         }
-        throw new Error(errorMessage);
+      } catch (err: any) {
+        console.error('Waitlist Error:', err);
+        setError(err.message || text[language].error);
+      } finally {
+        setIsSubmitting(false);
       }
-
-      setIsJoined(true); // Changed from setIsSubmitted to setIsJoined to match existing state variable
-    } catch (err: any) {
-      console.error('Waitlist Error:', err);
-      setError(err.message || t.landing.error);
-    } finally {
-      setIsSubmitting(false);
     }
-   }
   };
 
   return (
@@ -105,6 +127,23 @@ export function LandingPage({ language }: LandingPageProps) {
         backgroundColor: '#1a1a1a'
       }}
     >
+      {/* High-Specificity White Color Enforcement */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        input.white-placeholder::placeholder {
+          color: white !important;
+          opacity: 1 !important;
+          -webkit-text-fill-color: white !important;
+        }
+        input.white-placeholder {
+          color: white !important;
+          -webkit-text-fill-color: white !important;
+        }
+        ::placeholder {
+          color: white !important;
+          opacity: 1 !important;
+        }
+      ` }} />
+
       {/* Atmospheric Overlay: 75% Black from bottom to 0% at horizon */}
       <div 
         className="absolute inset-0"
@@ -114,10 +153,16 @@ export function LandingPage({ language }: LandingPageProps) {
       ></div>
 
       {/* Content Container */}
-      <div className="relative z-10 h-full flex flex-col items-center justify-center px-3">
+      <div className="relative z-10 h-full flex flex-col items-center justify-center px-4">
         
         {/* The Hero Messaging - Upper-Middle, Centered */}
-        <div className="flex-1 flex items-center justify-center" style={{ marginTop: '-60px' }}>
+        <motion.div 
+          className="flex-1 flex items-center justify-center"
+          animate={{ 
+            marginTop: isMobileFormExpanded ? '-320px' : '-60px'
+          }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        >
           <div className="text-center max-w-5xl px-4">
             <motion.h1 
               initial={{ y: 40, opacity: 0 }}
@@ -133,7 +178,7 @@ export function LandingPage({ language }: LandingPageProps) {
                 letterSpacing: '-0.02em'
               }}
             >
-              {t.landing.headline}
+              {text[language].headline}
             </motion.h1>
 
             <motion.p
@@ -150,81 +195,191 @@ export function LandingPage({ language }: LandingPageProps) {
                 letterSpacing: '-0.01em'
               }}
             >
-              {t.landing.subheadline}
+              {text[language].subheadline}
             </motion.p>
           </div>
-        </div>
+        </motion.div>
 
-        {/* The "Rodar Waitlist" Pill - 120px from bottom */}
-        <div className="absolute left-1/2 transform -translate-x-1/2 w-full max-w-[600px] px-4" style={{ bottom: 'clamp(80px, 12vh, 120px)' }}>
+        {/* The "Rodar Waitlist" Pill - Substantially adjusted for mobile height */}
+        <div className="absolute left-0 right-0 mx-auto w-full max-w-[900px] px-2" style={{ bottom: 'clamp(85px, 13vh, 120px)' }}>
           <motion.div
             initial={{ y: 60, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 1.2, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            className="flex justify-center"
           >
-            {!isJoined ? (
-              <form onSubmit={handleWaitlistSubmit} className="relative">
-                {/* Mobile Layout */}
-                <div 
-                  className="flex sm:hidden flex-col gap-2.5 p-2.5"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.14)',
-                    backdropFilter: 'blur(40px)',
-                    WebkitBackdropFilter: 'blur(40px)',
-                    borderRadius: '32px',
-                    border: '1px solid rgba(255, 255, 255, 0.25)',
-                    boxShadow: '0 12px 48px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.1)'
-                  }}
-                >
-                  {/* Badge - Just text, no pill */}
-                  <div className="w-full px-5 py-2 text-center">
-                    <span 
-                      className="font-bold"
-                      style={{
-                        color: '#00A86B',
-                        fontSize: '11px',
-                        letterSpacing: '0.08em',
-                        textTransform: 'uppercase'
-                      }}
-                    >
-                      {t.landing.waitlistBadge}
-                    </span>
-                  </div>
+            {!isSubmitted ? (
+              <form onSubmit={handleWaitlistSubmit} className="w-full sm:max-w-fit mx-auto">
+                {/* Mobile Layout - Collapsible */}
+                <div className="flex sm:hidden flex-col w-full mx-auto px-1">
+                  <AnimatePresence mode="wait">
+                    {!isMobileFormExpanded ? (
+                      // Collapsed - Just the CTA Button
+                      <motion.div
+                        key="collapsed"
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9 }}
+                        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                      >
+                        <Button
+                          type="button"
+                          onClick={() => setIsMobileFormExpanded(true)}
+                          className="w-full h-12 font-bold text-black hover:scale-[1.02] transition-transform duration-200"
+                          style={{
+                            background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)',
+                            borderRadius: '100px',
+                            fontSize: '11px',
+                            letterSpacing: '0.1em',
+                            textTransform: 'uppercase',
+                            boxShadow: '0 12px 48px rgba(0, 0, 0, 0.6), 0 4px 24px rgba(255, 215, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.5)'
+                          }}
+                        >
+                          {text[language].cta}
+                        </Button>
+                      </motion.div>
+                    ) : (
+                      // Expanded - Full Form
+                      <motion.div
+                        key="expanded"
+                        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                        className="flex flex-col gap-2 p-2 relative w-full"
+                        style={{
+                          background: 'rgba(255, 255, 255, 0.14)',
+                          backdropFilter: 'blur(34px)',
+                          WebkitBackdropFilter: 'blur(34px)',
+                          borderRadius: '28px',
+                          border: '1px solid rgba(255, 255, 255, 0.25)',
+                          boxShadow: '0 12px 48px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.1)'
+                        }}
+                      >
+                        {/* Close Button - Reduced size */}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setIsMobileFormExpanded(false);
+                          }}
+                          className="absolute top-2.5 right-2.5 w-7 h-7 flex items-center justify-center rounded-full bg-black/15 hover:bg-black/30 transition-colors z-[100] cursor-pointer ring-1 ring-white/10"
+                        >
+                          <X className="w-3.5 h-3.5 text-white pointer-events-none" />
+                        </button>
 
-                  {/* Input - with background */}
-                  <Input
-                    type="email"
-                    placeholder={t.landing.emailPlaceholder}
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={isSubmitting}
-                    className="w-full h-14 md:h-16 px-6 md:px-8 text-white border-0 placeholder:text-white/40 mb-4 bg-white/5 backdrop-blur-md rounded-2xl border-white/10"
-                    required
-                    onInvalid={(e: any) => e.target.setCustomValidity(t.landing.invalidEmailError)}
-                    onInput={(e: any) => e.target.setCustomValidity('')}
-                  />
+                        {/* Badge */}
+                        <div className="w-full px-5 py-1.5 text-center">
+                          <span 
+                            className="font-bold"
+                            style={{
+                              color: '#00A86B',
+                              fontSize: '10px',
+                              letterSpacing: '0.08em',
+                              textTransform: 'uppercase'
+                            }}
+                          >
+                            {text[language].waitlistBadge}
+                          </span>
+                        </div>
 
-                  {/* Button */}
-                  <Button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full h-14 font-bold text-black hover:scale-[1.02] transition-transform duration-200"
-                    style={{
-                      background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)',
-                      borderRadius: '24px',
-                      fontSize: '12px',
-                      letterSpacing: '0.1em',
-                      textTransform: 'uppercase',
-                      boxShadow: '0 4px 24px rgba(255, 215, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.5)'
-                    }}
-                  >
-                    {isSubmitting ? '...' : t.landing.cta}
-                  </Button>
+                        {/* First Name */}
+                        <Input
+                          type="text"
+                          placeholder={text[language].firstNamePlaceholder}
+                          value={formData.firstName}
+                          onChange={(e) => handleInputChange('firstName', e.target.value)}
+                          className="white-placeholder w-full h-10 border-0 !text-white focus-visible:ring-0 focus-visible:ring-offset-0 px-5"
+                          style={{
+                            background: 'rgba(255, 255, 255, 0.15)',
+                            borderRadius: '20px',
+                            fontSize: '13px',
+                            fontWeight: 400
+                          }}
+                          required
+                        />
+
+                        {/* Last Name */}
+                        <Input
+                          type="text"
+                          placeholder={text[language].lastNamePlaceholder}
+                          value={formData.lastName}
+                          onChange={(e) => handleInputChange('lastName', e.target.value)}
+                          className="white-placeholder w-full h-10 border-0 !text-white focus-visible:ring-0 focus-visible:ring-offset-0 px-5"
+                          style={{
+                            background: 'rgba(255, 255, 255, 0.15)',
+                            borderRadius: '20px',
+                            fontSize: '13px',
+                            fontWeight: 400
+                          }}
+                          required
+                        />
+
+                        {/* Date of Birth */}
+                        <Input
+                          type="date"
+                          placeholder={text[language].dobPlaceholder}
+                          value={formData.dob}
+                          onChange={(e) => handleInputChange('dob', e.target.value)}
+                          className="white-placeholder w-full h-10 border-0 !text-white focus-visible:ring-0 focus-visible:ring-offset-0 px-5 [&::-webkit-datetime-edit]:text-white [&::-webkit-calendar-picker-indicator]:invert"
+                          style={{
+                            background: 'rgba(255, 255, 255, 0.15)',
+                            borderRadius: '20px',
+                            fontSize: '13px',
+                            fontWeight: 400,
+                            colorScheme: 'dark'
+                          }}
+                          required
+                        />
+
+                        {/* Email */}
+                        <Input
+                          type="email"
+                          placeholder={text[language].emailPlaceholder}
+                          value={formData.email}
+                          onChange={(e) => handleInputChange('email', e.target.value)}
+                          className="white-placeholder w-full h-10 border-0 !text-white focus-visible:ring-0 focus-visible:ring-offset-0 px-5"
+                          style={{
+                            background: 'rgba(255, 255, 255, 0.15)',
+                            borderRadius: '20px',
+                            fontSize: '13px',
+                            fontWeight: 400
+                          }}
+                          required
+                        />
+
+                        {/* Button */}
+                        <Button
+                          type="submit"
+                          disabled={isSubmitting}
+                          className="w-full h-12 font-bold text-black hover:scale-[1.02] transition-transform duration-200"
+                          style={{
+                            background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)',
+                            borderRadius: '20px',
+                            fontSize: '11px',
+                            letterSpacing: '0.1em',
+                            textTransform: 'uppercase',
+                            boxShadow: '0 4px 24px rgba(255, 215, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.5)'
+                          }}
+                        >
+                          {isSubmitting ? '...' : text[language].cta}
+                        </Button>
+
+                        {/* Error Message */}
+                        {error && (
+                          <p className="mt-1 text-center text-red-400 text-[10px] font-medium px-2">
+                            {error}
+                          </p>
+                        )}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
 
-                {/* Desktop Layout */}
+                {/* Desktop Layout - Single Horizontal Pill */}
                 <div 
-                  className="hidden sm:flex items-center gap-2.5 px-2 py-2"
+                  className="hidden sm:flex items-center gap-2 px-2 py-2"
                   style={{
                     background: 'rgba(255, 255, 255, 0.14)',
                     backdropFilter: 'blur(40px)',
@@ -236,7 +391,7 @@ export function LandingPage({ language }: LandingPageProps) {
                 >
                   {/* Badge */}
                   <div 
-                    className="px-4 py-2.5 shrink-0"
+                    className="px-3 py-2.5 shrink-0"
                     style={{
                       background: '#00A86B',
                       borderRadius: '100px',
@@ -244,27 +399,68 @@ export function LandingPage({ language }: LandingPageProps) {
                     }}
                   >
                     <span 
-                      className="text-white font-bold"
+                      className="text-white font-bold whitespace-nowrap"
                       style={{
-                        fontSize: '11px',
+                        fontSize: '9px',
                         letterSpacing: '0.08em',
                         textTransform: 'uppercase'
                       }}
                     >
-                      {t.landing.waitlistBadge}
+                      {text[language].waitlistBadge}
                     </span>
                   </div>
 
-                  {/* Input */}
+                  {/* First Name */}
+                  <Input
+                    type="text"
+                    placeholder={text[language].firstNamePlaceholder}
+                    value={formData.firstName}
+                    onChange={(e) => handleInputChange('firstName', e.target.value)}
+                    className="white-placeholder w-[110px] h-auto py-2.5 border-0 bg-transparent !text-white focus-visible:ring-0 focus-visible:ring-offset-0 px-2"
+                    style={{
+                      fontSize: '13px',
+                      fontWeight: 400
+                    }}
+                    required
+                  />
+
+                  {/* Last Name */}
+                  <Input
+                    type="text"
+                    placeholder={text[language].lastNamePlaceholder}
+                    value={formData.lastName}
+                    onChange={(e) => handleInputChange('lastName', e.target.value)}
+                    className="white-placeholder w-[110px] h-auto py-2.5 border-0 bg-transparent !text-white focus-visible:ring-0 focus-visible:ring-offset-0 px-2"
+                    style={{
+                      fontSize: '13px',
+                      fontWeight: 400
+                    }}
+                    required
+                  />
+
+                  {/* Date of Birth */}
+                  <Input
+                    type="date"
+                    value={formData.dob}
+                    onChange={(e) => handleInputChange('dob', e.target.value)}
+                    className="white-placeholder w-[130px] h-auto py-2.5 border-0 bg-transparent !text-white focus-visible:ring-0 focus-visible:ring-offset-0 px-2 [&::-webkit-datetime-edit]:text-white [&::-webkit-calendar-picker-indicator]:invert"
+                    style={{
+                      fontSize: '12px',
+                      fontWeight: 400,
+                      colorScheme: 'dark'
+                    }}
+                    required
+                  />
+
+                  {/* Email */}
                   <Input
                     type="email"
-                    placeholder={t.landing.emailPlaceholder}
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={isSubmitting}
-                    className="flex-1 h-auto border-0 bg-transparent text-white placeholder:text-white/50 focus-visible:ring-0 focus-visible:ring-offset-0 px-4"
+                    placeholder={text[language].emailPlaceholder}
+                    value={formData.email}
+                    onChange={(e) => handleInputChange('email', e.target.value)}
+                    className="white-placeholder w-[180px] h-auto py-2.5 border-0 bg-transparent !text-white focus-visible:ring-0 focus-visible:ring-offset-0 px-2"
                     style={{
-                      fontSize: '15px',
+                      fontSize: '13px',
                       fontWeight: 400
                     }}
                     required
@@ -274,37 +470,37 @@ export function LandingPage({ language }: LandingPageProps) {
                   <Button
                     type="submit"
                     disabled={isSubmitting}
-                    className="h-11 px-7 shrink-0 font-bold text-black hover:scale-105 transition-transform duration-200"
+                    className="h-11 px-5 shrink-0 font-bold text-black hover:scale-105 transition-transform duration-200"
                     style={{
                       background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)',
                       borderRadius: '100px',
-                      fontSize: '12px',
+                      fontSize: '10px',
                       letterSpacing: '0.1em',
                       textTransform: 'uppercase',
                       boxShadow: '0 4px 24px rgba(255, 215, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.5)'
                     }}
                   >
-                    {isSubmitting ? '...' : t.landing.cta}
+                    {isSubmitting ? '...' : text[language].cta}
                   </Button>
                 </div>
                 
-                {/* Error Message */}
+                {/* Desktop Error Message */}
                 {error && (
-                  <p className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-red-300 text-[10px] md:text-xs whitespace-nowrap">
+                  <p className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 text-red-400 text-sm font-medium w-full text-center">
                     {error}
                   </p>
                 )}
               </form>
             ) : (
-              /* Success State */
               <div 
                 className="flex items-center justify-center gap-3 px-6 py-4 h-16"
                 style={{
                   background: 'rgba(255, 255, 255, 0.14)',
                   backdropFilter: 'blur(40px)',
+                  WebkitBackdropFilter: 'blur(40px)',
                   borderRadius: '100px',
                   border: '1px solid rgba(255, 255, 255, 0.25)',
-                  boxShadow: '0 12px 48px rgba(0, 0, 0, 0.6)'
+                  boxShadow: '0 12px 48px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.1)'
                 }}
               >
                 <div 
@@ -315,10 +511,25 @@ export function LandingPage({ language }: LandingPageProps) {
                 >
                   <span className="text-white text-base font-bold">✓</span>
                 </div>
-                <span className="text-white font-semibold text-sm sm:text-base">{t.landing.thankYou}</span>
+                <span className="text-white font-semibold text-sm sm:text-base">{text[language].thankYou}</span>
               </div>
             )}
           </motion.div>
+        </div>
+
+        {/* Footer Section */}
+        <div className="absolute bottom-4 left-0 right-0 flex flex-col items-center gap-1.5 opacity-50 pointer-events-none">
+          <p className="text-white text-[9px] sm:text-[10px] font-medium tracking-wider">
+            {text[language].copyright}
+          </p>
+          <div className="flex flex-col items-center gap-0.5">
+            <p className="text-white text-[8px] sm:text-[9px] font-bold tracking-widest uppercase">
+              {text[language].support}
+            </p>
+            <p className="text-white text-[7px] sm:text-[8px] font-medium tracking-widest uppercase opacity-80">
+              {text[language].terms} | {text[language].privacy}
+            </p>
+          </div>
         </div>
 
       </div>

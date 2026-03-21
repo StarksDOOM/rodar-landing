@@ -16,8 +16,11 @@
     "headline": "Move at your own pace.",
     "subheadline": "The Dominican Republic's car-sharing mobility platform.",
     "waitlistBadge": "RODAR WAITLIST",
-    "emailPlaceholder": "Your email address...",
-    "cta": "JOIN",
+    "emailPlaceholder": "Your best email...",
+    "firstNamePlaceholder": "First Name",
+    "lastNamePlaceholder": "Last Name",
+    "dobPlaceholder": "Date of Birth (MM/DD)",
+    "cta": "Request Early Access",
     "thankYou": "Done! We'll contact you soon.",
     "invalidEmailError": "Please enter a valid email address.",
     "error": "Failed to join waitlist. Please try again."

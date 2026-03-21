@@ -16,8 +16,11 @@
     "headline": "Muévete a tu ritmo.",
     "subheadline": "La plataforma de movilidad compartida de la República Dominicana.",
     "waitlistBadge": "LISTA DE ESPERA RODAR",
-    "emailPlaceholder": "Tu correo electrónico...",
-    "cta": "UNIRME",
+    "emailPlaceholder": "Tu mejor correo...",
+    "firstNamePlaceholder": "Nombre",
+    "lastNamePlaceholder": "Apellido",
+    "dobPlaceholder": "Fecha de Nacimiento (MM/DD)",
+    "cta": "Solicitar Acceso",
     "thankYou": "¡Listo! Te contactaremos pronto.",
     "invalidEmailError": "Por favor ingresa un correo electrónico válido.",
     "error": "Error al unirse a la lista de espera. Por favor, inténtalo de nuevo."
