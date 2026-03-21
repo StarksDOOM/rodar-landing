@@ -89,7 +89,14 @@ export function ContactPage({ language }: ContactPageProps) {
           // Safely check if the response is JSON before parsing
           if (text && (text.trim().startsWith('{') || text.trim().startsWith('['))) {
             const result = JSON.parse(text);
-            errorMessage = result.error || result.message || errorMessage;
+            if (result.details) {
+              const details = Object.entries(result.details)
+                .map(([key, value]) => `${key}: ${value}`)
+                .join(', ');
+              errorMessage = `${result.error || errorMessage} (${details})`;
+            } else {
+              errorMessage = result.error || result.message || errorMessage;
+            }
           } else if (text && text.length < 200 && !text.includes('<!DOCTYPE')) {
             // If it's a short non-HTML string, use it
             errorMessage = text;
