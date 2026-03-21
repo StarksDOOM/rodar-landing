@@ -39,16 +39,21 @@ export default async function handler(req: any, res: any) {
   }
 
   // Debug: Confirm environment variables are present (without leaking them)
-  const hasApiKey = !!process.env.MAILCHIMP_API_KEY;
-  const hasServerPrefix = !!process.env.MAILCHIMP_SERVER_PREFIX;
-  const hasListId = !!process.env.MAILCHIMP_LIST_ID;
+  // NOTE: User has VITE_MAILCHIMP_API_KEY in Vercel
+  const apiKey = process.env.MAILCHIMP_API_KEY || process.env.VITE_MAILCHIMP_API_KEY;
+  const serverPrefix = process.env.MAILCHIMP_SERVER_PREFIX || process.env.VITE_MAILCHIMP_SERVER_PREFIX;
+  const listId = process.env.MAILCHIMP_LIST_ID || process.env.VITE_MAILCHIMP_LIST_ID;
+
+  const hasApiKey = !!apiKey;
+  const hasServerPrefix = !!serverPrefix;
+  const hasListId = !!listId;
 
   if (!hasApiKey || !hasServerPrefix) {
     console.error('MAILCHIMP_CONFIG_ERROR:', {
       hasApiKey,
       hasServerPrefix,
       hasListId,
-      envKeys: Object.keys(process.env).filter(k => k.startsWith('MAILCHIMP'))
+      envKeys: Object.keys(process.env).filter(k => k.includes('MAILCHIMP'))
     });
     return res.status(500).json({ 
       error: 'Mailchimp configuration is missing in environment.',
@@ -56,10 +61,10 @@ export default async function handler(req: any, res: any) {
     });
   }
 
-  // Configure Mailchimp client using environment variables
+  // Configure Mailchimp client
   mailchimp.setConfig({
-    apiKey: process.env.MAILCHIMP_API_KEY,
-    server: process.env.MAILCHIMP_SERVER_PREFIX, // e.g. "us18"
+    apiKey: apiKey,
+    server: serverPrefix, // e.g. "us18"
   });
 
   try {

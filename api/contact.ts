@@ -46,10 +46,12 @@ export default async function handler(req: any, res: any) {
   }
 
   // Debug: Confirm environment variables are present
-  const hasResendKey = !!process.env.RESEND_API_KEY;
+  const resendApiKey = process.env.RESEND_API_KEY || process.env.VITE_RESEND_API_KEY;
+  const hasResendKey = !!resendApiKey;
+  
   if (!hasResendKey) {
     console.error('RESEND_CONFIG_ERROR: hasResendKey: false', {
-      envKeys: Object.keys(process.env).filter(k => k.startsWith('RESEND'))
+      envKeys: Object.keys(process.env).filter(k => k.includes('RESEND'))
     });
     return res.status(500).json({ 
       error: 'Resend configuration is missing in environment.',
@@ -57,7 +59,7 @@ export default async function handler(req: any, res: any) {
     });
   }
 
-  const resend = new Resend(process.env.RESEND_API_KEY);
+  const resend = new Resend(resendApiKey);
 
   try {
     // Send email using Resend
