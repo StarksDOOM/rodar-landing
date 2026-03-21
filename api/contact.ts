@@ -46,9 +46,15 @@ export default async function handler(req: any, res: any) {
   }
 
   // Debug: Confirm environment variables are present
-  if (!process.env.RESEND_API_KEY) {
-    console.error('MISSING ENVIRONMENT VARIABLES: hasResendKey: false');
-    return res.status(500).json({ error: 'Resend configuration is missing in environment.' });
+  const hasResendKey = !!process.env.RESEND_API_KEY;
+  if (!hasResendKey) {
+    console.error('RESEND_CONFIG_ERROR: hasResendKey: false', {
+      envKeys: Object.keys(process.env).filter(k => k.startsWith('RESEND'))
+    });
+    return res.status(500).json({ 
+      error: 'Resend configuration is missing in environment.',
+      details: { hasResendKey }
+    });
   }
 
   const resend = new Resend(process.env.RESEND_API_KEY);
