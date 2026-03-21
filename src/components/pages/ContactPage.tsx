@@ -142,7 +142,7 @@ export function ContactPage({ language }: ContactPageProps) {
       ></div>
 
       {/* Content */}
-      <div className="relative z-10 pt-24 md:pt-32 pb-24 md:pb-32 px-3">
+      <div className="relative z-10 pt-20 md:pt-32 pb-[clamp(85px,13vh,120px)] px-3">
         <div className="max-w-[900px] mx-auto">
           
           {/* The Glass Slab Container */}
@@ -196,7 +196,7 @@ export function ContactPage({ language }: ContactPageProps) {
                       placeholder={t.contact.form.name}
                       value={formData.name}
                       onChange={(e) => handleInputChange('name', e.target.value)}
-                      className="w-full h-14 px-6 text-white border-0 placeholder:text-white/40"
+                      className="w-full h-10 md:h-14 px-6 text-white border-0 placeholder:text-white/40"
                       style={{
                         background: 'rgba(255, 255, 255, 0.05)',
                         backdropFilter: 'blur(10px)',
@@ -217,7 +217,7 @@ export function ContactPage({ language }: ContactPageProps) {
                       placeholder={t.contact.form.email}
                       value={formData.email}
                       onChange={(e) => handleInputChange('email', e.target.value)}
-                      className="w-full h-14 px-6 text-white border-0 placeholder:text-white/40"
+                      className="w-full h-10 md:h-14 px-6 text-white border-0 placeholder:text-white/40"
                       style={{
                         background: 'rgba(255, 255, 255, 0.05)',
                         backdropFilter: 'blur(10px)',
@@ -260,7 +260,7 @@ export function ContactPage({ language }: ContactPageProps) {
                   <Button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full h-14 font-bold text-black hover:scale-[1.02] transition-transform duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full h-12 md:h-14 font-bold text-black hover:scale-[1.02] transition-transform duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                     style={{
                       background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)',
                       borderRadius: '100px',
