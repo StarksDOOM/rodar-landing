@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { Resend } from 'resend';
 
 /**
@@ -14,6 +15,14 @@ export default async function handler(req: any, res: any) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  // Basic security: Check origin/referer (optional but recommended)
+  const origin = req.headers.origin || req.headers.referer;
+  const isAuthorized = !origin || origin.includes('rodar.do') || origin.includes('localhost') || origin.includes('127.0.0.1');
+  
+  if (!isAuthorized) {
+    return res.status(403).json({ error: 'Forbidden' });
+  }
+
   const { name, email, message } = req.body;
 
   // Basic validation for required contact fields
@@ -26,15 +35,15 @@ export default async function handler(req: any, res: any) {
   try {
     // Send email using Resend
     const { data, error } = await resend.emails.send({
-      from: 'Rodar Contact <onboarding@resend.dev>',
-      to: 'rmansempire@gmail.com',
+      from: 'Rodar Contact <hola@rodar.do>',
+      to: ['rmansempire@gmail.com', 'leo.fulgencio@gmail.com'],
       subject: `Rodar Message from: ${name}`,
       text: `Name: ${name}\nEmail: ${email}\n\n${message}`,
     });
 
     if (error) {
       console.error('Resend Error:', error);
-      return res.status(400).json({ error });
+      return res.status(400).json({ error: error.message || 'Error sending email' });
     }
 
     return res.status(200).json({ success: true, data });

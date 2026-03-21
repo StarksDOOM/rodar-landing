@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import mailchimp from '@mailchimp/mailchimp_marketing';
 
 /**
@@ -12,6 +13,14 @@ export default async function handler(req: any, res: any) {
   // Only allow POST requests
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  // Basic security: Check origin/referer (optional but recommended)
+  const origin = req.headers.origin || req.headers.referer;
+  const isAuthorized = !origin || origin.includes('rodar.do') || origin.includes('localhost') || origin.includes('127.0.0.1');
+  
+  if (!isAuthorized) {
+    return res.status(403).json({ error: 'Forbidden' });
   }
 
   const { email } = req.body;
@@ -36,7 +45,7 @@ export default async function handler(req: any, res: any) {
 
     return res.status(200).json({ success: true, data: response });
   } catch (err: any) {
-    console.error('Mailchimp Error:', err);
+    console.error('Mailchimp Error:', err.message || err);
     
     // Gracefully handle if the member is already subscribed
     if (err.response && err.response.body && err.response.body.title === 'Member Exists') {
