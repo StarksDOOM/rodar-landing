@@ -3,12 +3,15 @@
 import mailchimp from '@mailchimp/mailchimp_marketing';
 
 /**
+ * /api/subscribe
+ * 
  * Vercel Serverless Function Handler for Mailchimp Waitlist Subscription.
  * Configures the Mailchimp marketing client and adds a new member to the specified list.
+ * Supports both standard MAILCHIMP_* and VITE_MAILCHIMP_* environment variable prefixes
+ * to ensure compatibility with various local and production hosting environments.
  * 
- * @param req - Incoming Vercel request object (expected POST with email).
- * @param res - Outgoing Vercel response object.
- * @returns A JSON response indicating if the subscription was successful or already exists.
+ * @param {any} req - Incoming request object.
+ * @param {any} res - Outgoing response object.
  */
 export default async function handler(req: any, res: any) {
   // Only allow POST requests
@@ -29,8 +32,11 @@ export default async function handler(req: any, res: any) {
     return res.status(403).json({ error: 'Forbidden' });
   }
 
-  const { email } = req.body;
+  const { email, firstName, lastName, dob } = req.body;
   const trimmedEmail = (email || '').trim();
+  const trimmedFirstName = (firstName || '').trim();
+  const trimmedLastName = (lastName || '').trim();
+  const trimmedDob = (dob || '').trim();
 
   // Basic validation to ensure an email is provided and matches a simple regex
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -55,10 +61,15 @@ export default async function handler(req: any, res: any) {
   });
 
   try {
-    // Attempt to add a new member to the Mailchimp audience
-    const response = await mailchimp.lists.addListMember(process.env.MAILCHIMP_LIST_ID || '', {
+    // Attempt to add a new member to the Mailchimp audience with merge fields
+    const response = await mailchimp.lists.addListMember(listId || '', {
       email_address: trimmedEmail,
       status: 'subscribed',
+      merge_fields: {
+        FNAME: trimmedFirstName,
+        LNAME: trimmedLastName,
+        BIRTHDAY: trimmedDob
+      }
     });
 
     return res.status(200).json({ success: true, data: response });

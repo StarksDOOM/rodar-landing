@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { fileURLToPath } from 'url'
@@ -7,8 +7,6 @@ import { createJiti } from 'jiti'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
-
-console.log('[Vite] Config loading with local API support...')
 
 const jiti = createJiti(import.meta.url, { moduleCache: false })
 
@@ -78,15 +76,32 @@ const apiPlugin = () => ({
 })
 
 // https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [
-    react(),
-    tailwindcss(),
-    apiPlugin(),
-  ],
-  resolve: {
-    alias: {
-      '@': resolve(__dirname, './src'),
+/**
+ * Vite Configuration
+ * 
+ * Includes a custom 'api-plugin' to simulate Vercel Serverless Functions locally during development.
+ * Automatically loads .env variables into process.env to bridge the gap between Vite's client-side 
+ * env loading and Node-based API handlers.
+ */
+export default defineConfig(({ mode }) => {
+  // Load env file based on `mode` in the current working directory.
+  // Set the third parameter to '' to load all env regardless of the `VITE_` prefix.
+  const env = loadEnv(mode, process.cwd(), '')
+  
+  // Ensure process.env is populated for the local API routes handled by apiPlugin
+  Object.assign(process.env, env)
+
+  return {
+    plugins: [
+      react(),
+      tailwindcss(),
+      apiPlugin(),
+    ],
+    resolve: {
+      alias: {
+        '@': resolve(__dirname, './src'),
+      },
     },
-  },
+  }
 })
+
