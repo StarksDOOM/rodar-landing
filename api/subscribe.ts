@@ -3,17 +3,29 @@
 import mailchimp from '@mailchimp/mailchimp_marketing';
 
 /**
+ * Simple in-memory rate limiter for local and serverless cold-starts.
+ * Note: For high-traffic production, a distributed store like Redis/Upstash is recommended.
+ */
+const rateLimitMap = new Map<string, { count: number, lastReset: number }>();
+const RATE_LIMIT_WINDOW = 60 * 60 * 1000; // 1 hour
+const MAX_REQUESTS = 10; // Max 10 per hour per IP
+
+/**
  * /api/subscribe
  * 
  * Vercel Serverless Function Handler for Mailchimp Waitlist Subscription.
- * Configures the Mailchimp marketing client and adds a new member to the specified list.
- * Supports both standard MAILCHIMP_* and VITE_MAILCHIMP_* environment variable prefixes
- * to ensure compatibility with various local and production hosting environments.
- * 
- * @param {any} req - Incoming request object.
- * @param {any} res - Outgoing response object.
+ * Optimized with:
+ * - Multi-layer Spam Protection: Honeypot, Timing Check (min 3s), and Rate Limiting.
+ * - Security: Custom security headers and Origin verification.
  */
 export default async function handler(req: any, res: any) {
+  // Add Security Headers
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Content-Security-Policy', "default-src 'none'; frame-ancestors 'none';");
+
   // Only allow POST requests
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -25,23 +37,57 @@ export default async function handler(req: any, res: any) {
                        origin.includes('rodar.do') || 
                        origin.includes('localhost') || 
                        origin.includes('127.0.0.1') ||
-                       origin.includes('vercel.app'); // Allow Vercel preview deployments
+                       origin.includes('vercel.app'); 
   
   if (!isAuthorized) {
     console.warn('Security Check Failed for origin:', origin);
     return res.status(403).json({ error: 'Forbidden' });
   }
 
-  const { email, firstName, lastName, dob } = req.body;
+  // Rate Limiting Logic (Simple IP-based)
+  const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+  const now = Date.now();
+  const rateLimit = rateLimitMap.get(ip) || { count: 0, lastReset: now };
+
+  if (now - rateLimit.lastReset > RATE_LIMIT_WINDOW) {
+    rateLimit.count = 0;
+    rateLimit.lastReset = now;
+  }
+
+  if (rateLimit.count >= MAX_REQUESTS) {
+    return res.status(429).json({ error: 'Too many requests. Please try again later.' });
+  }
+
+  rateLimit.count++;
+  rateLimitMap.set(ip, rateLimit);
+
+  const { email, firstName, lastName, middleName, dob, ms } = req.body;
+
+  // 1. Honeypot check: middleName should be empty (bots usually fill it)
+  if (middleName) {
+    console.warn('Spam detected: Honeypot field filled.');
+    return res.status(400).json({ error: 'Spam detected. Request rejected.' });
+  }
+
+  // 2. Timing check: Humans usually take more than 3 seconds to fill a form
+  if (!ms || ms < 3000) {
+    console.warn(`Spam detected: Fast submission (${ms}ms).`);
+    return res.status(400).json({ error: 'Submission too fast. Are you a bot?' });
+  }
+
   const trimmedEmail = (email || '').trim();
   const trimmedFirstName = (firstName || '').trim();
   const trimmedLastName = (lastName || '').trim();
   const trimmedDob = (dob || '').trim();
 
-  // Basic validation to ensure an email is provided and matches a simple regex
+  // Basic validation
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!trimmedEmail || !emailRegex.test(trimmedEmail)) {
+  if (!trimmedEmail || !emailRegex.test(trimmedEmail) || trimmedEmail.length > 254) {
     return res.status(400).json({ error: 'Please provide a valid email address' });
+  }
+
+  if (trimmedFirstName.length > 50 || trimmedLastName.length > 50) {
+    return res.status(400).json({ error: 'Name too long' });
   }
 
   // Check environment variables
@@ -51,17 +97,17 @@ export default async function handler(req: any, res: any) {
 
   if (!apiKey || !serverPrefix) {
     console.error('MAILCHIMP_CONFIG_ERROR: Missing configuration');
-    return res.status(500).json({ error: 'Mailchimp configuration is missing in environment.' });
+    return res.status(500).json({ error: 'Internal server error. Please try again later.' });
   }
 
   // Configure Mailchimp client
   mailchimp.setConfig({
     apiKey: apiKey,
-    server: serverPrefix, // e.g. "us18"
+    server: serverPrefix,
   });
 
   try {
-    // Attempt to add a new member to the Mailchimp audience with merge fields
+    console.log(`Subscribing ${trimmedEmail} to list ${listId}...`);
     const response = await mailchimp.lists.addListMember(listId || '', {
       email_address: trimmedEmail,
       status: 'subscribed',
@@ -74,13 +120,16 @@ export default async function handler(req: any, res: any) {
 
     return res.status(200).json({ success: true, data: response });
   } catch (err: any) {
-    console.error('Mailchimp Error:', err.message || err);
+    console.error('Mailchimp Error Detail:', {
+      message: err.message || err,
+      status: err.status,
+      response: err.response?.body || 'No response body'
+    });
     
-    // Gracefully handle if the member is already subscribed
     if (err.response && err.response.body && err.response.body.title === 'Member Exists') {
       return res.status(200).json({ success: true, message: 'Already subscribed' });
     }
 
-    return res.status(500).json({ error: err.message || 'Error subscribing to waitlist' });
+    return res.status(500).json({ error: 'Error subscribing to waitlist. Please try again.' });
   }
 }
