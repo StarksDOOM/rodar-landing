@@ -83,22 +83,19 @@ export function ContactPage({ language }: ContactPageProps) {
       });
 
       if (!response.ok) {
-        let errorMessage = 'Failed to send message';
+        let errorMessage = 'Something went wrong. Please try again.';
         try {
           const text = await response.text();
-          try {
+          // Safely check if the response is JSON before parsing
+          if (text && (text.trim().startsWith('{') || text.trim().startsWith('['))) {
             const result = JSON.parse(text);
-          const errorData = result.error || result.message;
-          if (typeof errorData === 'object') {
-            errorMessage = errorData.message || JSON.stringify(errorData);
-          } else {
-            errorMessage = errorData || errorMessage;
-          }
-          } catch (e) {
-            errorMessage = text || errorMessage;
+            errorMessage = result.error || result.message || errorMessage;
+          } else if (text && text.length < 200 && !text.includes('<!DOCTYPE')) {
+            // If it's a short non-HTML string, use it
+            errorMessage = text;
           }
         } catch (e) {
-          // ignore
+          console.error('Failed to parse error response:', e);
         }
         throw new Error(errorMessage);
       }

@@ -1,4 +1,4 @@
-import 'dotenv/config';
+// REMOVED 'dotenv/config' import which causes crashes in production.
 import { Resend } from 'resend';
 
 /**
@@ -15,11 +15,16 @@ export default async function handler(req: any, res: any) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // Basic security: Check origin/referer (optional but recommended)
-  const origin = req.headers.origin || req.headers.referer;
-  const isAuthorized = !origin || origin.includes('rodar.do') || origin.includes('localhost') || origin.includes('127.0.0.1');
+  // Basic security: Check origin/referer
+  const origin = req.headers.origin || req.headers.referer || '';
+  const isAuthorized = !origin || 
+                       origin.includes('rodar.do') || 
+                       origin.includes('localhost') || 
+                       origin.includes('127.0.0.1') ||
+                       origin.includes('vercel.app'); // Allow Vercel preview deployments
   
   if (!isAuthorized) {
+    console.warn('Security Check Failed for origin:', origin);
     return res.status(403).json({ error: 'Forbidden' });
   }
 
@@ -38,6 +43,12 @@ export default async function handler(req: any, res: any) {
   }
   if (!trimmedMessage || trimmedMessage.length > 5000) {
     return res.status(400).json({ error: 'Valid message is required (max 5000 chars)' });
+  }
+
+  // Debug: Confirm environment variables are present
+  if (!process.env.RESEND_API_KEY) {
+    console.error('MISSING ENVIRONMENT VARIABLES: hasResendKey: false');
+    return res.status(500).json({ error: 'Resend configuration is missing in environment.' });
   }
 
   const resend = new Resend(process.env.RESEND_API_KEY);

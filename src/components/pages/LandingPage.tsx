@@ -55,44 +55,43 @@ export function LandingPage({ language }: LandingPageProps) {
         return;
       }
 
-      try {
-        const response = await fetch('/api/subscribe', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ email: trimmedEmail }),
-        });
+     try {
+      const response = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: trimmedEmail, // Use trimmedEmail here
+        }),
+      });
 
-        if (!response.ok) {
-          let errorMessage = 'Failed to join waitlist';
-          try {
-            const text = await response.text();
-            try {
-              const result = JSON.parse(text);
-            const errorData = result.error || result.message;
-            if (typeof errorData === 'object') {
-              errorMessage = errorData.message || JSON.stringify(errorData);
-            } else {
-              errorMessage = errorData || errorMessage;
-            }
-            } catch (e) {
-              errorMessage = text || errorMessage;
-            }
-          } catch (e) {
-            // ignore
+      if (!response.ok) {
+        let errorMessage = t.landing.error;
+        try {
+          const text = await response.text();
+          // Safely check if the response is JSON before parsing
+          if (text && (text.trim().startsWith('{') || text.trim().startsWith('['))) {
+            const result = JSON.parse(text);
+            errorMessage = result.error || result.message || errorMessage;
+          } else if (text && text.length < 200 && !text.includes('<!DOCTYPE')) {
+            // If it's a short non-HTML string, use it
+            errorMessage = text;
           }
-          throw new Error(errorMessage);
+        } catch (e) {
+          console.error('Failed to parse error response:', e);
         }
-
-        setIsJoined(true);
-      } catch (err: any) {
-        console.error('Waitlist Error:', err);
-        setError(err.message || 'Something went wrong. Please try again.');
-      } finally {
-        setIsSubmitting(false);
+        throw new Error(errorMessage);
       }
+
+      setIsJoined(true); // Changed from setIsSubmitted to setIsJoined to match existing state variable
+    } catch (err: any) {
+      console.error('Waitlist Error:', err);
+      setError(err.message || t.landing.error);
+    } finally {
+      setIsSubmitting(false);
     }
+   }
   };
 
   return (

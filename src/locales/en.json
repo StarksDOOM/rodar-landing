@@ -19,7 +19,8 @@
     "emailPlaceholder": "Your email address...",
     "cta": "JOIN",
     "thankYou": "Done! We'll contact you soon.",
-    "invalidEmailError": "Please enter a valid email address."
+    "invalidEmailError": "Please enter a valid email address.",
+    "error": "Failed to join waitlist. Please try again."
   },
   "about": {
     "title": "About Rodar",

@@ -19,7 +19,8 @@
     "emailPlaceholder": "Tu correo electrónico...",
     "cta": "UNIRME",
     "thankYou": "¡Listo! Te contactaremos pronto.",
-    "invalidEmailError": "Por favor ingresa un correo electrónico válido."
+    "invalidEmailError": "Por favor ingresa un correo electrónico válido.",
+    "error": "Error al unirse a la lista de espera. Por favor, inténtalo de nuevo."
   },
   "about": {
     "title": "Sobre Rodar",

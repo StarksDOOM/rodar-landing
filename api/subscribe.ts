@@ -1,4 +1,5 @@
-import 'dotenv/config';
+// REMOVED 'dotenv/config' import which causes crashes in production as it's a devDependency.
+// Vercel handles environment variables automatically via process.env.
 import mailchimp from '@mailchimp/mailchimp_marketing';
 
 /**
@@ -15,11 +16,16 @@ export default async function handler(req: any, res: any) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // Basic security: Check origin/referer (optional but recommended)
-  const origin = req.headers.origin || req.headers.referer;
-  const isAuthorized = !origin || origin.includes('rodar.do') || origin.includes('localhost') || origin.includes('127.0.0.1');
+  // Basic security: Check origin/referer
+  const origin = req.headers.origin || req.headers.referer || '';
+  const isAuthorized = !origin || 
+                       origin.includes('rodar.do') || 
+                       origin.includes('localhost') || 
+                       origin.includes('127.0.0.1') ||
+                       origin.includes('vercel.app'); // Allow Vercel preview deployments
   
   if (!isAuthorized) {
+    console.warn('Security Check Failed for origin:', origin);
     return res.status(403).json({ error: 'Forbidden' });
   }
 
@@ -30,6 +36,16 @@ export default async function handler(req: any, res: any) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!trimmedEmail || !emailRegex.test(trimmedEmail)) {
     return res.status(400).json({ error: 'Please provide a valid email address' });
+  }
+
+  // Debug: Confirm environment variables are present (without leaking them)
+  if (!process.env.MAILCHIMP_API_KEY || !process.env.MAILCHIMP_SERVER_PREFIX) {
+    console.error('MISSING ENVIRONMENT VARIABLES:', {
+      hasApiKey: !!process.env.MAILCHIMP_API_KEY,
+      hasServerPrefix: !!process.env.MAILCHIMP_SERVER_PREFIX,
+      hasListId: !!process.env.MAILCHIMP_LIST_ID
+    });
+    return res.status(500).json({ error: 'Mailchimp configuration is missing in environment.' });
   }
 
   // Configure Mailchimp client using environment variables
