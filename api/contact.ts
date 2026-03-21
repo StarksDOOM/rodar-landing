@@ -24,10 +24,20 @@ export default async function handler(req: any, res: any) {
   }
 
   const { name, email, message } = req.body;
+  const trimmedName = (name || '').trim();
+  const trimmedEmail = (email || '').trim();
+  const trimmedMessage = (message || '').trim();
 
-  // Basic validation for required contact fields
-  if (!name || !email || !message) {
-    return res.status(400).json({ error: 'Missing required fields' });
+  // Field validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!trimmedName || trimmedName.length > 200) {
+    return res.status(400).json({ error: 'Valid name is required (max 200 chars)' });
+  }
+  if (!trimmedEmail || !emailRegex.test(trimmedEmail)) {
+    return res.status(400).json({ error: 'Valid email address is required' });
+  }
+  if (!trimmedMessage || trimmedMessage.length > 5000) {
+    return res.status(400).json({ error: 'Valid message is required (max 5000 chars)' });
   }
 
   const resend = new Resend(process.env.RESEND_API_KEY);
@@ -37,8 +47,8 @@ export default async function handler(req: any, res: any) {
     const { data, error } = await resend.emails.send({
       from: 'Rodar Contact <hola@rodar.do>',
       to: ['rmansempire@gmail.com', 'leo.fulgencio@gmail.com'],
-      subject: `Rodar Message from: ${name}`,
-      text: `Name: ${name}\nEmail: ${email}\n\n${message}`,
+      subject: `Rodar Message from: ${trimmedName}`,
+      text: `Name: ${trimmedName}\nEmail: ${trimmedEmail}\n\n${trimmedMessage}`,
     });
 
     if (error) {

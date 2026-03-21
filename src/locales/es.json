@@ -18,7 +18,8 @@
     "waitlistBadge": "LISTA DE ESPERA RODAR",
     "emailPlaceholder": "Tu correo electrónico...",
     "cta": "UNIRME",
-    "thankYou": "¡Listo! Te contactaremos pronto."
+    "thankYou": "¡Listo! Te contactaremos pronto.",
+    "invalidEmailError": "Por favor ingresa un correo electrónico válido."
   },
   "about": {
     "title": "Sobre Rodar",
@@ -54,7 +55,13 @@
       "email": "Correo electrónico",
       "message": "Tu mensaje",
       "messagePlaceholder": "Cuéntanos cómo podemos ayudarte...",
-      "submit": "Enviar mensaje"
+      "submit": "Enviar mensaje",
+      "errors": {
+        "nameRequired": "El nombre es obligatorio",
+        "emailInvalid": "Por favor ingresa un correo electrónico válido",
+        "messageRequired": "El mensaje es obligatorio",
+        "messageTooLong": "El mensaje es demasiado largo (máximo 5000 caracteres)"
+      }
     },
     "success": {
       "title": "¡Mensaje enviado!",

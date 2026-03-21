@@ -40,17 +40,28 @@ export function LandingPage({ language }: LandingPageProps) {
    */
   const handleWaitlistSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email && /^\S+@\S+\.\S+$/.test(email)) {
+    // Initial check for non-empty email, more robust validation follows
+    if (email) { 
       setIsSubmitting(true);
       setError(null);
       
+      const trimmedEmail = email.trim();
+    
+      // Email regex validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(trimmedEmail)) {
+        setError(t.landing.invalidEmailError); // Using existing error state
+        setIsSubmitting(false); // Stop loading state
+        return;
+      }
+
       try {
         const response = await fetch('/api/subscribe', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ email }),
+          body: JSON.stringify({ email: trimmedEmail }),
         });
 
         if (!response.ok) {

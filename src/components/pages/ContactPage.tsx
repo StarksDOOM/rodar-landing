@@ -48,6 +48,24 @@ export function ContactPage({ language }: ContactPageProps) {
    */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const trimmedName = formData.name.trim();
+    const trimmedEmail = formData.email.trim();
+    const trimmedMessage = formData.message.trim();
+
+    // Validation
+    const errors: string[] = [];
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!trimmedName) errors.push(t.contact.form.errors.nameRequired);
+    if (!emailRegex.test(trimmedEmail)) errors.push(t.contact.form.errors.emailInvalid);
+    if (!trimmedMessage) errors.push(t.contact.form.errors.messageRequired);
+    if (trimmedMessage.length > 5000) errors.push(t.contact.form.errors.messageTooLong);
+
+    if (errors.length > 0) {
+      setError(errors[0]); // Show first error
+      return;
+    }
+
     setIsSubmitting(true);
     setError(null);
 
@@ -57,7 +75,11 @@ export function ContactPage({ language }: ContactPageProps) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          name: trimmedName,
+          email: trimmedEmail,
+          message: trimmedMessage,
+        }),
       });
 
       if (!response.ok) {

@@ -24,10 +24,12 @@ export default async function handler(req: any, res: any) {
   }
 
   const { email } = req.body;
+  const trimmedEmail = (email || '').trim();
 
-  // Basic validation to ensure an email is provided
-  if (!email) {
-    return res.status(400).json({ error: 'Email is required' });
+  // Basic validation to ensure an email is provided and matches a simple regex
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!trimmedEmail || !emailRegex.test(trimmedEmail)) {
+    return res.status(400).json({ error: 'Please provide a valid email address' });
   }
 
   // Configure Mailchimp client using environment variables
@@ -39,7 +41,7 @@ export default async function handler(req: any, res: any) {
   try {
     // Attempt to add a new member to the Mailchimp audience
     const response = await mailchimp.lists.addListMember(process.env.MAILCHIMP_LIST_ID || '', {
-      email_address: email,
+      email_address: trimmedEmail,
       status: 'subscribed',
     });
 

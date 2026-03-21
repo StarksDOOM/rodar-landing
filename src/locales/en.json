@@ -18,7 +18,8 @@
     "waitlistBadge": "RODAR WAITLIST",
     "emailPlaceholder": "Your email address...",
     "cta": "JOIN",
-    "thankYou": "Done! We'll contact you soon."
+    "thankYou": "Done! We'll contact you soon.",
+    "invalidEmailError": "Please enter a valid email address."
   },
   "about": {
     "title": "About Rodar",
@@ -54,7 +55,13 @@
       "email": "Email address",
       "message": "Your message",
       "messagePlaceholder": "Tell us how we can help you...",
-      "submit": "Send message"
+      "submit": "Send message",
+      "errors": {
+        "nameRequired": "Name is required",
+        "emailInvalid": "Please enter a valid email address",
+        "messageRequired": "Message is required",
+        "messageTooLong": "Message is too long (max 5000 characters)"
+      }
     },
     "success": {
       "title": "Message sent!",
