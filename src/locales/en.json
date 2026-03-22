@@ -25,7 +25,8 @@
     "invalidEmailError": "Please enter a valid email address.",
     "error": "Failed to join waitlist. Please try again.",
     "validation": {
-      "required": "Please fill out this field"
+      "required": "Please fill out this field",
+      "tooYoung": "You must be 18 or older to join the waitlist"
     }
   },
   "about": {

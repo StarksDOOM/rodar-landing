@@ -62,7 +62,7 @@ export default async function handler(req: any, res: any) {
   rateLimit.count++;
   rateLimitMap.set(ip, rateLimit);
 
-  const { email, firstName, lastName, middleName, dob, ms } = req.body;
+  const { email, firstName, lastName, middleName, dob, ms, language } = req.body;
 
   // 1. Honeypot check: middleName should be empty (bots usually fill it)
   if (middleName) {
@@ -76,10 +76,28 @@ export default async function handler(req: any, res: any) {
     return res.status(400).json({ error: 'Submission too fast. Are you a bot?' });
   }
 
-  const trimmedEmail = (email || '').trim();
-  const trimmedFirstName = (firstName || '').trim();
-  const trimmedLastName = (lastName || '').trim();
-  const trimmedDob = (dob || '').trim();
+  const trimmedEmail = email.trim();
+  const trimmedFirstName = firstName.trim();
+  const trimmedLastName = lastName.trim();
+  const trimmedDob = dob.trim();
+
+  // 18+ Age Validation
+  if (trimmedDob) {
+    const birthDate = new Date(trimmedDob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    if (age < 18) {
+      return res.status(400).json({ 
+        error: language === 'es' 
+          ? 'Debes tener 18 años o más para unirte a la lista de espera' 
+          : 'You must be 18 or older to join the waitlist' 
+      });
+    }
+  }
 
   // Basic validation
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

@@ -25,7 +25,8 @@
     "invalidEmailError": "Por favor ingresa un correo electrónico válido.",
     "error": "Error al unirse a la lista de espera. Por favor, inténtalo de nuevo.",
     "validation": {
-      "required": "Por favor, completa este campo"
+      "required": "Por favor, completa este campo",
+      "tooYoung": "Debes tener 18 años o más para unirte a la lista de espera"
     }
   },
   "about": {
