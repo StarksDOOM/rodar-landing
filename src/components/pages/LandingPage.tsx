@@ -57,7 +57,8 @@ export function LandingPage({ language }: LandingPageProps) {
       terms: 'TÉRMINOS DE SERVICIO',
       privacy: 'POLÍTICA DE PRIVACIDAD',
       validation: {
-        required: 'Por favor, completa este campo'
+        required: 'Por favor, completa este campo',
+        tooYoung: 'Debes tener 18 años o más para unirte a la lista de espera'
       }
     },
     en: {
@@ -76,9 +77,22 @@ export function LandingPage({ language }: LandingPageProps) {
       terms: 'TERMS OF SERVICE',
       privacy: 'PRIVACY POLICY',
       validation: {
-        required: 'Please fill out this field'
+        required: 'Please fill out this field',
+        tooYoung: 'You must be 18 or older to join the waitlist'
       }
     }
+  };
+
+  const validateAge = (dobString: string) => {
+    if (!dobString) return true;
+    const birthDate = new Date(dobString);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age >= 18;
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -88,6 +102,11 @@ export function LandingPage({ language }: LandingPageProps) {
   const handleWaitlistSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.firstName && formData.lastName && formData.dob && formData.email) {
+      if (!validateAge(formData.dob)) {
+        setError(text[language].validation.tooYoung);
+        return;
+      }
+
       setIsSubmitting(true);
       setError(null);
 
@@ -97,26 +116,16 @@ export function LandingPage({ language }: LandingPageProps) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             ...formData,
-            ms: Date.now() - formMountedAt // Send the time elapsed since form was mounted (timing check)
+            language,
+            ms: Date.now() - formMountedAt
           }),
         });
 
         if (response.ok) {
           setIsSubmitted(true);
         } else {
-          let errorMessage = text[language].error;
-          try {
-            const resText = await response.text();
-            if (resText && (resText.trim().startsWith('{') || resText.trim().startsWith('['))) {
-              const result = JSON.parse(resText);
-              errorMessage = result.error || result.message || errorMessage;
-            } else if (resText && resText.length < 200 && !resText.includes('<!DOCTYPE')) {
-              errorMessage = resText;
-            }
-          } catch (e) {
-            console.error('Failed to parse error response:', e);
-          }
-          throw new Error(errorMessage);
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error || text[language].error);
         }
       } catch (err: any) {
         console.error('Waitlist Error:', err);
@@ -343,23 +352,36 @@ export function LandingPage({ language }: LandingPageProps) {
                           onInput={(e: any) => e.target.setCustomValidity('')}
                         />
 
-                        {/* Date of Birth */}
                         <Input
                           type="date"
                           placeholder={text[language].dobPlaceholder}
                           value={formData.dob}
                           onChange={(e) => handleInputChange('dob', e.target.value)}
-                          className="white-placeholder w-full h-10 border-0 !text-white focus-visible:ring-0 focus-visible:ring-offset-0 px-5 [&::-webkit-datetime-edit]:text-white [&::-webkit-calendar-picker-indicator]:invert"
+                          className="white-placeholder w-full h-10 border-0 !text-white focus-visible:ring-0 focus-visible:ring-offset-0 pl-4 pr-1 [&::-webkit-datetime-edit]:text-white [&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:p-0 [&::-webkit-calendar-picker-indicator]:m-0 [&::-webkit-calendar-picker-indicator]:w-4 [&::-webkit-calendar-picker-indicator]:h-4"
                           style={{
                             background: 'rgba(255, 255, 255, 0.15)',
                             borderRadius: '20px',
                             fontSize: '13px',
                             fontWeight: 400,
-                            colorScheme: 'dark'
+                            colorScheme: 'dark',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px'
                           }}
                           required
-                          onInvalid={(e: any) => e.target.setCustomValidity(text[language].validation.required)}
-                          onInput={(e: any) => e.target.setCustomValidity('')}
+                          onInvalid={(e: any) => {
+                            if (e.target.value && !validateAge(e.target.value)) {
+                              e.target.setCustomValidity(text[language].validation.tooYoung);
+                            } else {
+                              e.target.setCustomValidity(text[language].validation.required);
+                            }
+                          }}
+                          onInput={(e: any) => {
+                            e.target.setCustomValidity('');
+                            if (e.target.value && !validateAge(e.target.value)) {
+                              e.target.setCustomValidity(text[language].validation.tooYoung);
+                            }
+                          }}
                         />
 
                         {/* Email */}
@@ -497,8 +519,19 @@ export function LandingPage({ language }: LandingPageProps) {
                       colorScheme: 'dark'
                     }}
                     required
-                    onInvalid={(e: any) => e.target.setCustomValidity(text[language].validation.required)}
-                    onInput={(e: any) => e.target.setCustomValidity('')}
+                    onInvalid={(e: any) => {
+                      if (e.target.value && !validateAge(e.target.value)) {
+                        e.target.setCustomValidity(text[language].validation.tooYoung);
+                      } else {
+                        e.target.setCustomValidity(text[language].validation.required);
+                      }
+                    }}
+                    onInput={(e: any) => {
+                      e.target.setCustomValidity('');
+                      if (e.target.value && !validateAge(e.target.value)) {
+                        e.target.setCustomValidity(text[language].validation.tooYoung);
+                      }
+                    }}
                   />
 
                   {/* Email */}
