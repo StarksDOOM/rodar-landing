@@ -1,6 +1,7 @@
 // REMOVED 'dotenv/config' import which causes crashes in production as it's a devDependency.
 // Vercel handles environment variables automatically via process.env.
 import mailchimp from '@mailchimp/mailchimp_marketing';
+import crypto from 'crypto';
 
 /**
  * Simple in-memory rate limiter for local and serverless cold-starts.
@@ -107,29 +108,42 @@ export default async function handler(req: any, res: any) {
   });
 
   try {
-    console.log(`Subscribing ${trimmedEmail} to list ${listId}...`);
-    const response = await mailchimp.lists.addListMember(listId || '', {
+    const subscriberHash = crypto.createHash('md5').update(trimmedEmail.toLowerCase()).digest('hex');
+    console.log(`Upserting ${trimmedEmail} (hash: ${subscriberHash}) to list ${listId}...`);
+    
+    // Mailchimp Birthday fields strictly require MM/DD format
+    // Input trimmedDob is YYYY-MM-DD (e.g. 1990-01-01)
+    let formattedBirthday = trimmedDob;
+    if (trimmedDob && trimmedDob.includes('-')) {
+      const parts = trimmedDob.split('-');
+      if (parts.length === 3) {
+        // parts[1] is month, parts[2] is day
+        formattedBirthday = `${parts[1]}/${parts[2]}`;
+      }
+    }
+
+    // Use setListMember (PUT) to add or update member, forcing status to 'subscribed'
+    const response = await mailchimp.lists.setListMember(listId || '', subscriberHash, {
       email_address: trimmedEmail,
+      status_if_new: 'subscribed',
       status: 'subscribed',
       merge_fields: {
         FNAME: trimmedFirstName,
         LNAME: trimmedLastName,
-        BIRTHDAY: trimmedDob
+        BIRTHDAY: formattedBirthday
       }
     });
 
+    console.log(`Mailchimp Success: ${trimmedEmail} is now subscribed.`);
     return res.status(200).json({ success: true, data: response });
   } catch (err: any) {
+    const errorBody = err.response?.body || {};
     console.error('Mailchimp Error Detail:', {
       message: err.message || err,
       status: err.status,
-      response: err.response?.body || 'No response body'
+      body: JSON.stringify(errorBody, null, 2)
     });
     
-    if (err.response && err.response.body && err.response.body.title === 'Member Exists') {
-      return res.status(200).json({ success: true, message: 'Already subscribed' });
-    }
-
     return res.status(500).json({ error: 'Error subscribing to waitlist. Please try again.' });
   }
 }
