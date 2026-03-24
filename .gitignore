@@ -26,6 +26,10 @@ dist-ssr
 
 # TypeScript
 *.tsbuildinfo
+*.js
+*.d.ts
+!vite.config.ts
+!src/**/*
 
 # Production
 .env
