@@ -47,7 +47,7 @@ export function LandingPage({ language }: LandingPageProps) {
       waitlistBadge: 'LISTA DE ESPERA RODAR',
       firstNamePlaceholder: 'Nombre',
       lastNamePlaceholder: 'Apellido',
-      dobPlaceholder: 'mm/dd/yyyy',
+      dobPlaceholder: 'DD/MM/YYYY',
       emailPlaceholder: 'Tu mejor correo...',
       cta: 'Solicitar Acceso',
       thankYou: '¡Listo! Te contactaremos pronto.',
@@ -67,7 +67,7 @@ export function LandingPage({ language }: LandingPageProps) {
       waitlistBadge: 'RODAR WAITLIST',
       firstNamePlaceholder: 'First Name',
       lastNamePlaceholder: 'Last Name',
-      dobPlaceholder: 'mm/dd/yyyy',
+      dobPlaceholder: 'MM/DD/YYYY',
       emailPlaceholder: 'Your best email...',
       cta: 'Request Access',
       thankYou: 'Done! We will contact you soon.',
@@ -83,9 +83,37 @@ export function LandingPage({ language }: LandingPageProps) {
     }
   };
 
+  /**
+   * Parses localized date strings (DD/MM/YYYY for ES, MM/DD/YYYY for EN) into ISO YYYY-MM-DD.
+   * If the input is already ISO (browser native) or invalid, returns as-is.
+   */
+  const parseLocalizedDate = (dobString: string) => {
+    if (!dobString || dobString.includes('-')) return dobString; // Already ISO or empty
+
+    const parts = dobString.split('/');
+    if (parts.length !== 3) return dobString;
+
+    const [p1, p2, p3] = parts;
+    if (language === 'es') {
+      // ES: DD/MM/YYYY -> YYYY-MM-DD
+      const day = p1.padStart(2, '0');
+      const month = p2.padStart(2, '0');
+      return `${p3}-${month}-${day}`;
+    } else {
+      // EN: MM/DD/YYYY -> YYYY-MM-DD
+      const month = p1.padStart(2, '0');
+      const day = p2.padStart(2, '0');
+      return `${p3}-${month}-${day}`;
+    }
+  };
+
   const validateAge = (dobString: string) => {
     if (!dobString) return true;
-    const birthDate = new Date(dobString);
+    // Standardize input for validation
+    const isoDate = parseLocalizedDate(dobString);
+    const birthDate = new Date(isoDate);
+    if (isNaN(birthDate.getTime())) return true; // Let native validation handle broken strings
+
     const today = new Date();
     let age = today.getFullYear() - birthDate.getFullYear();
     const m = today.getMonth() - birthDate.getMonth();
@@ -111,11 +139,13 @@ export function LandingPage({ language }: LandingPageProps) {
       setError(null);
 
       try {
+        const standardizedDob = parseLocalizedDate(formData.dob);
         const response = await fetch('/api/subscribe', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             ...formData,
+            dob: standardizedDob,
             language,
             ms: Date.now() - formMountedAt
           }),
