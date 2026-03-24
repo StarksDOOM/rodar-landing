@@ -353,9 +353,15 @@ export function LandingPage({ language }: LandingPageProps) {
                         />
 
                         <Input
-                          type="date"
+                          type={formData.dob ? "date" : "text"}
                           placeholder={text[language].dobPlaceholder}
                           value={formData.dob}
+                          onFocus={(e) => (e.target.type = "date")}
+                          onBlur={(e) => {
+                            if (!e.target.value) {
+                              e.target.type = "text";
+                            }
+                          }}
                           onChange={(e) => handleInputChange('dob', e.target.value)}
                           className="white-placeholder w-full h-10 border-0 !text-white focus-visible:ring-0 focus-visible:ring-offset-0 pl-4 pr-1 [&::-webkit-datetime-edit]:text-white [&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:p-0 [&::-webkit-calendar-picker-indicator]:m-0 [&::-webkit-calendar-picker-indicator]:w-4 [&::-webkit-calendar-picker-indicator]:h-4"
                           style={{
@@ -509,8 +515,15 @@ export function LandingPage({ language }: LandingPageProps) {
 
                   {/* Date of Birth */}
                   <Input
-                    type="date"
+                    type={formData.dob ? "date" : "text"}
+                    placeholder={text[language].dobPlaceholder}
                     value={formData.dob}
+                    onFocus={(e) => (e.target.type = "date")}
+                    onBlur={(e) => {
+                      if (!e.target.value) {
+                        e.target.type = "text";
+                      }
+                    }}
                     onChange={(e) => handleInputChange('dob', e.target.value)}
                     className="white-placeholder w-[130px] h-auto py-2.5 border-0 bg-transparent !text-white focus-visible:ring-0 focus-visible:ring-offset-0 px-2 [&::-webkit-datetime-edit]:text-white [&::-webkit-calendar-picker-indicator]:invert"
                     style={{
