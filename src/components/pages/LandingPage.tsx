@@ -644,21 +644,6 @@ export function LandingPage({ language }: LandingPageProps) {
           </motion.div>
         </div>
 
-        {/* Footer Section */}
-        <div className="absolute bottom-4 left-0 right-0 flex flex-col items-center gap-1.5 opacity-50 pointer-events-none">
-          <p className="text-white text-[9px] sm:text-[10px] font-medium tracking-wider">
-            {text[language].copyright}
-          </p>
-          <div className="flex flex-col items-center gap-0.5">
-            <p className="text-white text-[8px] sm:text-[9px] font-bold tracking-widest uppercase">
-              {text[language].support}
-            </p>
-            <p className="text-white text-[7px] sm:text-[8px] font-medium tracking-widest uppercase opacity-80">
-              {text[language].terms} | {text[language].privacy}
-            </p>
-          </div>
-        </div>
-
       </div>
     </div>
   );
