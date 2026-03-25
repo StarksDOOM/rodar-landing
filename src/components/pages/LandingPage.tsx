@@ -95,28 +95,37 @@ export function LandingPage({ language }: LandingPageProps) {
 
     const [p1, p2, p3] = parts;
     if (language === 'es') {
-      // ES: DD/MM/YYYY -> YYYY-MM-DD
+      // ES Format: DD/MM/YYYY -> Standardize to YYYY-MM-DD for API/Validation
       const day = p1.padStart(2, '0');
       const month = p2.padStart(2, '0');
       return `${p3}-${month}-${day}`;
     } else {
-      // EN: MM/DD/YYYY -> YYYY-MM-DD
+      // EN Format: MM/DD/YYYY -> Standardize to YYYY-MM-DD for API/Validation
       const month = p1.padStart(2, '0');
       const day = p2.padStart(2, '0');
       return `${p3}-${month}-${day}`;
     }
   };
 
+  /**
+   * Validates if the user is 18 years or older.
+   * Handles both localized manual entry and native browser date values.
+   */
   const validateAge = (dobString: string) => {
     if (!dobString) return true;
-    // Standardize input for validation
+    
+    // Convert to ISO format (YYYY-MM-DD) to ensure consistent Date parsing across regions
     const isoDate = parseLocalizedDate(dobString);
     const birthDate = new Date(isoDate);
-    if (isNaN(birthDate.getTime())) return true; // Let native validation handle broken strings
+    
+    // If date is invalid after parsing, let HTML5 native validation fallback
+    if (isNaN(birthDate.getTime())) return true;
 
     const today = new Date();
     let age = today.getFullYear() - birthDate.getFullYear();
     const m = today.getMonth() - birthDate.getMonth();
+    
+    // Adjust age if birthday hasn't occurred yet this year
     if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
       age--;
     }
@@ -139,7 +148,10 @@ export function LandingPage({ language }: LandingPageProps) {
       setError(null);
 
       try {
+        // Standardize the DOB to YYYY-MM-DD before sending to the backend.
+        // The backend expects this format to correctly calculate the Mailchimp BIRTHDAY merge field (MM/DD).
         const standardizedDob = parseLocalizedDate(formData.dob);
+        
         const response = await fetch('/api/subscribe', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
